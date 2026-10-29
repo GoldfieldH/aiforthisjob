@@ -36,3 +36,10 @@ The site is currently in **preview mode**: a "Preview version" banner, `noindex`
 ## Content rules
 
 Public sources only, never invent statistics, label vendor claims, no confidential or employer information, British English.
+
+## Content expansion (branch content-expansion)
+- Sections: /make-money-with-ai, /save-time-and-money, /use-agents-safely (content in `src/data-sections.mjs`).
+- /latest page and /feed.xml (RSS) are generated from each entry's `added` timestamp; both are in llms.txt, and /latest is in the sitemap.
+- Every use case (and each safety guide) has a "View prompt" block with a copy button.
+- `npm run check` checks internal links, anchors, JSON-LD, one-H1-per-page, and sitemap/feed/llms.txt links in `dist/`.
+- Motion is progressive enhancement: CSS scroll-driven animations with an IntersectionObserver/rAF fallback. Content stays visible without JS, and all motion is off under prefers-reduced-motion.
