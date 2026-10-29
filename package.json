@@ -1,0 +1,12 @@
+{
+  "name": "aiforthisjob",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AIForThisJob: static, SEO-friendly AI use-case library (MVP)",
+  "scripts": {
+    "build": "rm -rf dist && node src/build.mjs",
+    "build:launch": "rm -rf dist && PREVIEW=0 node src/build.mjs",
+    "serve": "npx --yes serve dist -l 4321"
+  }
+}
