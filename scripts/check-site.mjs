@@ -42,6 +42,42 @@ for (const file of ['sitemap.xml', 'feed.xml', 'llms.txt']) {
     if (!resolve(m[1])) { console.error(`BROKEN in ${file}: ${m[1]}`); errors++; }
   }
 }
+// SEO checks: unique titles/descriptions, lengths, canonical, social image, robots meta vs sitemap.
+const PREVIEW = /Disallow: \/\s*$/m.test(readFileSync(join(DIST, 'robots.txt'), 'utf8')) && !/Sitemap:/.test(readFileSync(join(DIST, 'robots.txt'), 'utf8'));
+const sitemap = readFileSync(join(DIST, 'sitemap.xml'), 'utf8');
+const inSitemap = new Set([...sitemap.matchAll(/<loc>https?:\/\/[^/<]+([^<]*)<\/loc>/g)].map((m) => m[1]));
+const decode = (t) => t.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+const seen = { title: new Map(), desc: new Map() };
+let warnings = 0;
+for (const f of html) {
+  const src = readFileSync(f, 'utf8');
+  const rel = '/' + f.slice(DIST.length);
+  const path = rel === '/index.html' ? '/' : rel.replace(/\.html$/, '');
+  const title = decode((src.match(/<title>([^<]*)<\/title>/) || [])[1] || '');
+  const desc = decode((src.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '');
+  const robots = (src.match(/<meta name="robots" content="([^"]*)"/) || [])[1] || '';
+  const noindex = /noindex/.test(robots);
+  if (!title) { console.error(`NO TITLE ${rel}`); errors++; }
+  if (!desc) { console.error(`NO DESCRIPTION ${rel}`); errors++; }
+  if (desc.length > 160) { console.error(`DESCRIPTION > 160 chars (${desc.length}) ${rel}`); errors++; }
+  if (title.length > 65) { console.warn(`warn: title ${title.length} chars ${rel}`); warnings++; }
+  if (!robots) { console.error(`NO ROBOTS META ${rel}`); errors++; }
+  if (PREVIEW && !noindex) { console.error(`PREVIEW BUILD BUT INDEXABLE ${rel}`); errors++; }
+  if (!noindex || PREVIEW) {
+    if (!rel.endsWith('404.html')) {
+      for (const [k, v] of [['title', title], ['desc', desc]]) { if (seen[k].has(v)) { console.error(`DUPLICATE ${k} ${rel} = ${seen[k].get(v)}`); errors++; } else seen[k].set(v, rel); }
+      const canon = (src.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
+      if (!canon || !/^https:\/\//.test(canon)) { console.error(`NO ABSOLUTE CANONICAL ${rel}`); errors++; }
+      else if (new URL(canon).pathname !== path) { console.error(`CANONICAL MISMATCH ${rel} -> ${canon}`); errors++; }
+      if (!inSitemap.has(path)) { console.error(`NOT IN SITEMAP ${path}`); errors++; }
+    }
+  }
+  if (!PREVIEW && noindex && inSitemap.has(path)) { console.error(`NOINDEX PAGE IN SITEMAP ${path}`); errors++; }
+  const og = (src.match(/<meta property="og:image" content="https?:\/\/[^/"]+([^"]+)"/) || [])[1];
+  if (!og || !resolve(og)) { console.error(`MISSING og:image file ${rel}`); errors++; }
+}
+if (inSitemap.has('/404')) { console.error('404 page is in the sitemap'); errors++; }
+console.log(`mode: ${PREVIEW ? 'PREVIEW (noindex, robots.txt blocks all)' : 'LAUNCH (indexable)'}; ${inSitemap.size} sitemap URLs; ${warnings} warnings`);
 const feed = readFileSync(join(DIST, 'feed.xml'), 'utf8');
 if (/&(?!amp;|lt;|gt;|quot;|apos;|#)/.test(feed)) { console.error('feed.xml has unescaped &'); errors++; }
 console.log(`${html.length} pages, ${links} internal links, ${ld} JSON-LD blocks checked, ${errors} problems`);
