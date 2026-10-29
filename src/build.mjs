@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { categories, useCases, guides, sources } from './data.mjs';
+import { categories, useCases, guides, sources, sections } from './data.mjs';
 
 const SITE = (process.env.SITE_URL || 'https://aiforthisjob.vercel.app').replace(/\/$/, '');
 const PREVIEW = process.env.PREVIEW !== '0'; // default: preview mode = noindex until Greg approves launch
@@ -17,8 +17,11 @@ const PACKS_ON_SALE = packs.every((p) => /^https:\/\/buy\.stripe\.com\//.test(p.
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const catBy = Object.fromEntries(categories.map((c) => [c.slug, c]));
+const secBy = Object.fromEntries(sections.map((s) => [s.slug, s]));
 const files = [];
 const urls = [];
+const day = (iso) => iso.slice(0, 10);
+const niceDate = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/London' });
 
 function write(path, content) {
   const p = join(OUT, path);
@@ -27,20 +30,33 @@ function write(path, content) {
   files.push(path);
 }
 
-function page({ path, title, description, body, jsonld = [], type = 'website' }) {
+const navLinks = [
+  ['/make-money-with-ai', 'Make money'],
+  ['/save-time-and-money', 'Save time & money'],
+  ['/use-agents-safely', 'Use agents safely'],
+  ['/use-cases', 'Library'],
+  ['/latest', 'Latest'],
+  ['/packs', 'Packs'],
+];
+
+function page({ path, title, description, body, jsonld = [], type = 'website', progress = false, bodyClass = '' }) {
   const url = SITE + (path === '/' ? '/' : path);
   const fullTitle = path === '/' ? title : `${title} | ${NAME}`;
   urls.push(path);
-  const ld = jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n');
+  const ld = jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`).join('\n');
+  const isCurrent = (href) => path === href || path.startsWith(href + '/');
   const html = `<!doctype html>
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${url}">
 ${PREVIEW ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="robots" content="index, follow">'}
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="${type}">
 <meta property="og:title" content="${esc(fullTitle)}">
 <meta property="og:description" content="${esc(description)}">
@@ -49,21 +65,25 @@ ${PREVIEW ? '<meta name="robots" content="noindex, nofollow">' : '<meta name="ro
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="${NAME}: latest use cases and guides" href="/feed.xml">
+<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.__aiftj)document.documentElement.classList.remove('js')},2500)</script>
 <link rel="stylesheet" href="/styles.css">
 ${ld}
 </head>
-<body>
+<body${bodyClass ? ` class="${bodyClass}"` : ''}>
+<a class="skip" href="#main">Skip to content</a>
 ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content is for review.</div>' : ''}
 <header class="site-header"><div class="wrap nav">
-<a class="logo" href="/"><span class="logo-mark">AI</span>ForThisJob</a>
-<nav aria-label="Main"><a href="/use-cases">Use cases</a><a href="/guides">Guides</a><a href="/roi-calculator">ROI calculator</a><a href="/packs">Packs</a><a class="btn btn-sm" href="/newsletter">Newsletter</a></nav>
-</div></header>
-<main>${body}</main>
+<a class="logo" href="/" aria-label="${NAME} home"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a>
+<nav class="nav-links" aria-label="Main">${navLinks.map(([h, t]) => `<a href="${h}"${isCurrent(h) ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</nav>
+<a class="btn btn-sm nav-cta" href="/newsletter">Newsletter</a>
+</div>${progress ? '<div class="progress" aria-hidden="true"><span></span></div>' : ''}</header>
+<main id="main">${body}</main>
 <footer class="site-footer"><div class="wrap footer-grid">
-<div><a class="logo" href="/"><span class="logo-mark">AI</span>ForThisJob</a><p class="muted">Which AI tool for which job, with honest notes on what it takes and whether it pays back. Made in the UK.</p></div>
-<div><h3>Browse</h3>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
-<div><h3>Learn</h3>${guides.map((g) => `<a href="/guides/${g.slug}">${esc(g.title.split(':')[0].split('?')[0])}</a>`).join('')}<a href="/roi-calculator">ROI calculator</a></div>
-<div><h3>About</h3><a href="/about">About</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
+<div class="footer-brand"><a class="logo" href="/"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a><p class="muted">Which AI for which job, with honest notes on what it takes and whether it pays back. Made in the UK.</p></div>
+<div><h2 class="footer-h">Explore</h2>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
+<div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
+<div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${NAME}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 <script src="/site.js" defer></script>
 </body>
@@ -73,14 +93,15 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 
 const crumbsLd = (items) => ({
   '@context': 'https://schema.org', '@type': 'BreadcrumbList',
-  itemListElement: items.map(([name, p], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + p })),
+  itemListElement: items.map(([name, p], i) => ({ '@type': 'ListItem', position: i + 1, name, item: SITE + (p === '/' ? '/' : p) })),
 });
-const crumbsHtml = (items) => `<nav class="crumbs" aria-label="Breadcrumb">${items.map(([n, p], i) => i === items.length - 1 ? `<span>${esc(n)}</span>` : `<a href="${p}">${esc(n)}</a>`).join(' / ')}</nav>`;
+const crumbsHtml = (items) => `<nav class="crumbs" aria-label="Breadcrumb">${items.map(([n, p], i) => i === items.length - 1 ? `<span aria-current="page">${esc(n)}</span>` : `<a href="${p}">${esc(n)}</a>`).join('<span class="sep" aria-hidden="true">›</span>')}</nav>`;
 
-const card = (u) => `<a class="card" href="/use-cases/${u.slug}"><span class="tag">${esc(catBy[u.cat].name)}</span><h3>${esc(u.title)}</h3><p>${esc(u.summary)}</p><span class="more">Read the playbook →</span></a>`;
+const card = (u, i = 0) => `<a class="card reveal" style="--i:${i % 6}" href="/use-cases/${u.slug}"><span class="tag">${esc(catBy[u.cat].name)}</span><h3>${esc(u.title)}</h3><p>${esc(u.summary)}</p><span class="more">Read the playbook <span aria-hidden="true">→</span></span></a>`;
+const guideCard = (g, i = 0) => `<a class="card reveal" style="--i:${i % 6}" href="/guides/${g.slug}"><span class="tag tag-guide">Guide</span><h3>${esc(g.title)}</h3><p>${esc(g.summary)}</p><span class="more">Read the guide <span aria-hidden="true">→</span></span></a>`;
 
-const signup = (id = 'signup') => `<section class="signup" id="${id}"><div class="wrap signup-inner">
-<div><h2>One useful AI use case a week</h2><p>A short email with a tested use case, the tools, a ready-to-use prompt and how to measure whether it pays back. No hype.</p></div>
+const signup = (id = 'signup') => `<section class="signup band-dark" id="${id}" aria-labelledby="${id}-h"><div class="wrap signup-inner reveal">
+<div><p class="eyebrow">Newsletter</p><h2 id="${id}-h">One useful AI use case a week.</h2><p>A short email with a tested use case, the tools, a ready-to-use prompt and how to tell whether it pays back. No hype.</p></div>
 <form class="newsletter-form" novalidate>
 <label for="${id}-email" class="sr">Email address</label>
 <input id="${id}-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
@@ -91,27 +112,104 @@ const signup = (id = 'signup') => `<section class="signup" id="${id}"><div class
 
 const sourceList = (keys) => `<ol class="sources">${keys.map((k) => { const s = sources[k]; return `<li><a href="${s.url}" rel="noopener" target="_blank">${esc(s.title)}</a> <span class="kind">${esc(s.kind)}</span></li>`; }).join('')}</ol>`;
 
+const promptBlock = (text, label = 'Ready-to-use prompt') => `<section class="prompt-block reveal" id="prompt" aria-labelledby="prompt-h">
+<h2 id="prompt-h">${esc(label)}</h2>
+<p class="muted small">Replace the [BRACKETS]. Only paste data you’re allowed to share with the tool you’re using.</p>
+<details class="prompt-details">
+<summary><span class="btn btn-sm">View prompt</span><span class="peek">${esc(text.split('\n')[0])}</span></summary>
+<div class="prompt-wrap"><button class="copy btn btn-sm btn-ghost" type="button">Copy prompt</button><pre class="prompt"><code>${esc(text)}</code></pre></div>
+</details></section>`;
+
+const moneyDisclaimer = `<div class="callout warn disclaimer" role="note"><strong>No income promises.</strong> ${esc(secBy['make-money-with-ai'].disclaimer)}</div>`;
+
+const layers = `<div class="layers" aria-hidden="true"><span class="layer l1" data-speed="0.25"></span><span class="layer l2" data-speed="0.45"></span><span class="layer l3" data-speed="0.65"></span><span class="layer grid-lines" data-speed="0.1"></span></div>`;
+
+// All entries for Latest / RSS (newest first; ties keep later-defined content first)
+const entries = [
+  ...useCases.map((u, i) => ({ kind: 'Use case', path: `/use-cases/${u.slug}`, title: u.title, summary: u.summary, added: u.added, section: u.section, cat: catBy[u.cat].name, order: i })),
+  ...guides.map((g, i) => ({ kind: 'Guide', path: `/guides/${g.slug}`, title: g.title, summary: g.summary, added: g.added, section: g.section, cat: g.section ? secBy[g.section].name : 'Guide', order: 100 + i })),
+].sort((a, b) => b.added.localeCompare(a.added) || b.order - a.order);
+
 // ---------- Home ----------
 const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', name: NAME, url: SITE + '/', logo: SITE + '/favicon.svg' };
 const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', name: NAME, url: SITE + '/', inLanguage: 'en-GB', description: 'A free library of AI use cases organised by job and industry.' };
+const sectionExamples = {
+  'make-money-with-ai': useCases.filter((u) => u.section === 'make-money-with-ai').slice(0, 3).map((u) => [`/use-cases/${u.slug}`, u.title]),
+  'save-time-and-money': ['draft-customer-email-replies', 'audit-software-subscriptions', 'compare-supplier-quotes'].map((s) => [`/use-cases/${s}`, useCases.find((u) => u.slug === s).title]),
+  'use-agents-safely': guides.filter((g) => g.section === 'use-agents-safely').slice(0, 3).map((g) => [`/guides/${g.slug}`, g.title]),
+};
+const panelTone = { 'make-money-with-ai': 'band-light', 'save-time-and-money': 'band-soft', 'use-agents-safely': 'band-dark' };
 page({
   path: '/', title: `${NAME}: which AI tool for which job, and does it pay back?`,
-  description: 'A free, plain-English library of AI use cases organised by job and industry: what AI really does, which tools to use, what you need first, a ready-to-use prompt and how to measure ROI.',
-  jsonld: [orgLd, siteLd],
+  description: 'A free, plain-English library of AI use cases: ways to make money with AI, save time and money, and use agents safely. Each with tools, a ready-to-use prompt and how to measure ROI.',
+  jsonld: [orgLd, siteLd], bodyClass: 'home',
   body: `
-<section class="hero"><div class="wrap">
+<section class="hero">${layers}<div class="wrap hero-inner">
 <p class="eyebrow">Free AI use-case library</p>
-<h1>Find the right AI tool for the job, and know whether it pays back.</h1>
-<p class="lede">Plain-English playbooks for real work. Each one covers what AI actually does, which tools to look at, what you need in place first, a ready-to-use prompt and how to measure the return. For small businesses, vibe coders and operations teams.</p>
-<div class="hero-cta"><a class="btn" href="/use-cases">Browse use cases</a><a class="btn btn-ghost" href="/roi-calculator">Work out your ROI</a></div>
+<h1 class="display">The right AI for the job.<br><span class="grad">And proof it pays.</span></h1>
+<p class="lede">Plain-English playbooks for real work: what AI actually does, which tools to look at, what you need first, a prompt to copy and how to measure the return.</p>
+<div class="hero-cta"><a class="btn btn-lg" href="/use-cases">Browse use cases</a><a class="btn btn-lg btn-ghost" href="/roi-calculator">Work out your ROI</a></div>
 <ul class="trust"><li>Sources on every entry</li><li>Vendor claims labelled</li><li>No invented stats</li></ul>
 </div></section>
-<section class="wrap section"><h2>Browse by job or industry</h2>
-<div class="grid cats">${categories.map((c) => `<a class="cat" href="/jobs/${c.slug}"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><span class="count">${useCases.filter((u) => u.cat === c.slug).length} use cases</span></a>`).join('')}</div></section>
-<section class="wrap section"><h2>Popular playbooks</h2><div class="grid">${['draft-customer-email-replies', 'automate-repetitive-workflows', 'vibe-code-an-internal-tool', 'reconciliation-break-investigation', 'meeting-notes-and-actions', 'repurpose-content-into-social-posts'].map((s) => card(useCases.find((u) => u.slug === s))).join('')}</div>
-<p><a href="/use-cases">See all ${useCases.length} use cases →</a></p></section>
-<section class="wrap section"><h2>Confused by agents and prompting? Start here</h2><div class="grid">${guides.map((g) => `<a class="card" href="/guides/${g.slug}"><span class="tag">Guide</span><h3>${esc(g.title)}</h3><p>${esc(g.summary)}</p></a>`).join('')}</div></section>
+<div class="panels" aria-label="Three ways in">
+${sections.map((s, i) => `<section class="panel ${panelTone[s.slug]}" aria-labelledby="panel-${s.slug}"><div class="wrap panel-inner reveal">
+<div><p class="eyebrow">${String(i + 1).padStart(2, '0')} · ${esc(s.eyebrow)}</p><h2 class="panel-h" id="panel-${s.slug}">${esc(s.headline)}</h2><p class="lede">${esc(s.intro)}</p><a class="btn" href="/${s.slug}">${esc(s.name)} <span aria-hidden="true">→</span></a></div>
+<ul class="panel-list">${sectionExamples[s.slug].map(([h, t]) => `<li><a href="${h}">${esc(t)}<span aria-hidden="true">›</span></a></li>`).join('')}</ul>
+</div></section>`).join('\n')}
+</div>
+<section class="wrap section"><div class="section-head reveal"><h2>Browse by job or industry</h2><a href="/use-cases">See all ${useCases.length} use cases →</a></div>
+<div class="grid cats">${categories.map((c, i) => `<a class="cat reveal" style="--i:${i % 6}" href="/jobs/${c.slug}"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><span class="count">${((n) => `${n} use case${n === 1 ? '' : 's'}`)(useCases.filter((u) => u.cat === c.slug).length)}</span></a>`).join('')}</div></section>
+<section class="band-soft"><div class="wrap section"><div class="section-head reveal"><h2>Just added</h2><a href="/latest">Everything new →</a></div>
+<div class="grid">${entries.slice(0, 6).map((e, i) => `<a class="card reveal" style="--i:${i}" href="${e.path}"><span class="tag">${esc(e.cat)}</span><h3>${esc(e.title)}</h3><p>${esc(e.summary)}</p><span class="more">${e.kind === 'Guide' ? 'Read the guide' : 'Read the playbook'} <span aria-hidden="true">→</span></span></a>`).join('')}</div></div></section>
+<section class="wrap section"><div class="section-head reveal"><h2>Popular playbooks</h2></div><div class="grid">${['draft-customer-email-replies', 'automate-repetitive-workflows', 'vibe-code-an-internal-tool', 'reconciliation-break-investigation', 'meeting-notes-and-actions', 'repurpose-content-into-social-posts'].map((s, i) => card(useCases.find((u) => u.slug === s), i)).join('')}</div></section>
+<section class="wrap section"><div class="section-head reveal"><h2>New to agents and prompting? Start here</h2><a href="/guides">All guides →</a></div><div class="grid">${guides.filter((g) => !g.section).map(guideCard).join('')}</div></section>
 ${signup('home-signup')}`,
+});
+
+// ---------- Section index pages ----------
+for (const s of sections) {
+  const ucs = useCases.filter((u) => u.section === s.slug);
+  const gds = guides.filter((g) => g.section === s.slug);
+  const items = [...gds.map((g) => ({ url: `/guides/${g.slug}`, name: g.title })), ...ucs.map((u) => ({ url: `/use-cases/${u.slug}`, name: u.title }))];
+  const crumbs = [['Home', '/'], [s.name, `/${s.slug}`]];
+  let aside = '';
+  if (s.slug === 'make-money-with-ai') aside = moneyDisclaimer;
+  if (s.slug === 'save-time-and-money') aside = `<div class="callout"><strong>Does it pay back?</strong> Time saved only counts if it’s redeployed or avoids a real cost. <a href="/roi-calculator">Run your numbers in the ROI calculator</a> or read <a href="/guides/measuring-ai-roi">how to measure AI ROI</a>.</div>`;
+  if (s.slug === 'use-agents-safely') aside = `<div class="callout"><strong>The short version.</strong> Give agents only the access they need, have a person approve anything sent, paid or deleted, test on real examples first, and write it down. Each guide comes with a prompt to help you do it.</div>`;
+  let lists = '';
+  if (gds.length) lists += `<h2 class="list-h">Guides</h2><div class="grid grid-2">${gds.map(guideCard).join('')}</div>`;
+  if (ucs.length) {
+    const newOnes = ucs.filter((u) => u.added > '2026-10-29T01');
+    const rest = ucs.filter((u) => !newOnes.includes(u));
+    if (s.slug === 'save-time-and-money' && rest.length) {
+      lists += `<h2 class="list-h">New playbooks</h2><div class="grid grid-2">${newOnes.map(card).join('')}</div><h2 class="list-h">More ways to save time</h2><div class="grid grid-2">${rest.map(card).join('')}</div>`;
+    } else lists += `<h2 class="list-h">${s.slug === 'make-money-with-ai' ? 'Ideas' : 'Use cases'}</h2><div class="grid grid-2">${ucs.map(card).join('')}</div>`;
+  }
+  if (s.slug === 'use-agents-safely') {
+    const rel = ['daily-inbox-triage', 'website-faq-assistant', 'automate-repetitive-workflows'].map((x) => useCases.find((u) => u.slug === x));
+    lists += `<h2 class="list-h">Use cases where these controls matter most</h2><div class="grid grid-2">${rel.map(card).join('')}</div>`;
+  }
+  page({
+    path: `/${s.slug}`, title: `${s.name}: practical guides and use cases`,
+    description: s.intro.slice(0, 300),
+    jsonld: [crumbsLd(crumbs), { '@context': 'https://schema.org', '@type': 'CollectionPage', name: s.name, description: s.intro, inLanguage: 'en-GB', url: `${SITE}/${s.slug}`, mainEntity: { '@type': 'ItemList', itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + it.url, name: it.name })) } }],
+    body: `<section class="section-hero ${panelTone[s.slug]}">${layers}<div class="wrap">${crumbsHtml(crumbs)}<p class="eyebrow">${esc(s.eyebrow)}</p><h1 class="display">${esc(s.headline)}</h1><p class="lede">${esc(s.intro)}</p></div></section>
+<div class="wrap section sticky-layout">
+<aside class="sticky-col"><div class="sticky-inner"><h2 class="sr">About this section</h2>${aside}<p class="muted small">${items.length} entries · <a href="/latest">See what’s new</a></p></div></aside>
+<div class="scroll-col">${lists}</div>
+</div>${signup('sec-signup')}`,
+  });
+}
+
+// ---------- Latest ----------
+page({
+  path: '/latest', title: 'Latest AI use cases and guides',
+  description: 'The newest additions to the AIForThisJob library, newest first. Also available as an RSS feed.',
+  jsonld: [crumbsLd([['Home', '/'], ['Latest', '/latest']]), { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Latest additions', itemListOrder: 'https://schema.org/ItemListOrderDescending', itemListElement: entries.map((e, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + e.path, name: e.title })) }],
+  body: `<section class="wrap narrow section">${crumbsHtml([['Home', '/'], ['Latest', '/latest']])}
+<p class="eyebrow">What’s new</p><h1 class="display-s">Latest additions</h1><p class="lede">Every new use case and guide, newest first. Follow along with the <a href="/feed.xml">RSS feed</a> or <a href="/newsletter">the newsletter</a>.</p>
+<ol class="timeline">${entries.map((e) => `<li class="reveal"><time datetime="${e.added}">${niceDate(e.added)}</time><a href="${e.path}"><span class="tag">${esc(e.kind)} · ${esc(e.cat)}</span><strong>${esc(e.title)}</strong><span class="muted">${esc(e.summary)}</span></a></li>`).join('')}</ol>
+</section>${signup('latest-signup')}`,
 });
 
 // ---------- Use case index ----------
@@ -120,9 +218,9 @@ page({
   description: `${useCases.length} practical AI use cases by job and industry, each with tools, prerequisites, a ready-to-use prompt, ROI measures and sources.`,
   jsonld: [crumbsLd([['Home', '/'], ['Use cases', '/use-cases']]), { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: useCases.map((u, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/use-cases/${u.slug}`, name: u.title })) }],
   body: `<section class="wrap section">${crumbsHtml([['Home', '/'], ['Use cases', '/use-cases']])}
-<h1>AI use-case library</h1><p class="lede">Every playbook follows the same format: the job, what AI does, the tools, what you need first, how to measure ROI, a prompt to copy and the sources.</p>
-<div class="filters" role="group" aria-label="Filter by job"><button class="chip active" data-filter="all">All</button>${categories.map((c) => `<button class="chip" data-filter="${c.slug}">${esc(c.name)}</button>`).join('')}</div>
-<div class="grid" id="uc-grid">${useCases.map((u) => card(u).replace('<a class="card"', `<a class="card" data-cat="${u.cat}"`)).join('')}</div></section>${signup('lib-signup')}`,
+<p class="eyebrow">The library</p><h1 class="display-s">AI use-case library</h1><p class="lede">Every playbook follows the same format: the job, what AI does, the tools, what you need first, how to measure it, a prompt to copy and the sources.</p>
+<div class="filters" role="group" aria-label="Filter by job"><button class="chip active" type="button" aria-pressed="true" data-filter="all">All</button>${categories.map((c) => `<button class="chip" type="button" aria-pressed="false" data-filter="${c.slug}">${esc(c.name)}</button>`).join('')}</div>
+<div class="grid" id="uc-grid">${useCases.map((u, i) => card(u, i).replace('<a class="card', `<a data-cat="${u.cat}" class="card`)).join('')}</div></section>${signup('lib-signup')}`,
 });
 
 // ---------- Category pages ----------
@@ -130,63 +228,80 @@ for (const c of categories) {
   const list = useCases.filter((u) => u.cat === c.slug);
   page({
     path: `/jobs/${c.slug}`, title: `AI for ${c.name.toLowerCase()}: use cases and tools`,
-    description: `${c.blurb} Practical AI use cases for ${c.name.toLowerCase()}, with tools, prompts and ROI measures.`,
+    description: `${c.blurb} Practical AI use cases for ${c.name.toLowerCase()}, with tools, prompts and ways to measure them.`,
     jsonld: [crumbsLd([['Home', '/'], ['Use cases', '/use-cases'], [c.name, `/jobs/${c.slug}`]])],
     body: `<section class="wrap section">${crumbsHtml([['Home', '/'], ['Use cases', '/use-cases'], [c.name, `/jobs/${c.slug}`]])}
-<h1>AI for ${esc(c.name.toLowerCase())}</h1><p class="lede">${esc(c.blurb)}</p>
+<h1 class="display-s">AI for ${esc(c.name.toLowerCase())}</h1><p class="lede">${esc(c.blurb)}</p>
+${c.slug === 'side-income' ? moneyDisclaimer : ''}
 <div class="grid">${list.map(card).join('')}</div>
 <p class="muted">More ${esc(c.name.toLowerCase())} use cases are on the way. <a href="/newsletter">Get them by email</a>.</p></section>`,
   });
 }
 
 // ---------- Use case pages ----------
+const toc = (items) => `<aside class="toc" aria-label="On this page"><div class="toc-inner"><p class="toc-h">On this page</p><ul>${items.map(([id, t]) => `<li><a href="#${id}">${esc(t)}</a></li>`).join('')}</ul><a class="btn btn-sm" href="#prompt">View prompt</a></div></aside>`;
 for (const u of useCases) {
   const c = catBy[u.cat];
-  const crumbs = [['Home', '/'], ['Use cases', '/use-cases'], [c.name, `/jobs/${c.slug}`], [u.title, `/use-cases/${u.slug}`]];
+  const s = secBy[u.section];
+  const crumbs = [['Home', '/'], [s.name, `/${s.slug}`], [u.title, `/use-cases/${u.slug}`]];
   const related = useCases.filter((x) => x.cat === u.cat && x.slug !== u.slug).slice(0, 3);
+  const roiLabel = u.roiLabel || 'How to measure ROI';
+  const tocItems = [['what', 'What AI does'], ['tools', 'Tools'], ['first', 'What you need first'], ['measure', roiLabel], ['evidence', 'Evidence'], ['prompt', 'Prompt'], ['sources', 'Sources']];
   page({
-    path: `/use-cases/${u.slug}`, title: `${u.title}: AI use case`, type: 'article',
-    description: `${u.summary} Tools, prerequisites, ROI measures and a ready-to-use prompt.`.slice(0, 300),
+    path: `/use-cases/${u.slug}`, title: `${u.title}: AI use case`, type: 'article', progress: true,
+    description: `${u.summary} Tools, what you need first, how to measure it and a ready-to-use prompt.`.slice(0, 300),
     jsonld: [crumbsLd(crumbs), {
       '@context': 'https://schema.org', '@type': 'Article', headline: u.title, description: u.summary, inLanguage: 'en-GB',
-      dateModified: TODAY, author: { '@type': 'Organization', name: NAME }, publisher: { '@type': 'Organization', name: NAME },
-      about: c.name, citation: u.sources.map((k) => sources[k].url), mainEntityOfPage: `${SITE}/use-cases/${u.slug}`,
+      datePublished: day(u.added), dateModified: TODAY, author: { '@type': 'Organization', name: NAME }, publisher: { '@type': 'Organization', name: NAME, logo: { '@type': 'ImageObject', url: SITE + '/favicon.svg' } },
+      about: c.name, articleSection: s.name, citation: u.sources.map((k) => sources[k].url), mainEntityOfPage: `${SITE}/use-cases/${u.slug}`,
     }],
-    body: `<article class="wrap narrow section">${crumbsHtml(crumbs)}
-<span class="tag">${esc(c.name)}</span>
-<h1>${esc(u.title)}</h1>
+    body: `<header class="article-hero"><div class="wrap article-grid article-head"><div class="toc-spacer" aria-hidden="true"></div><div>${crumbsHtml(crumbs)}
+<div class="tags"><a class="tag" href="/jobs/${c.slug}">${esc(c.name)}</a><a class="tag tag-guide" href="/${s.slug}">${esc(s.name)}</a></div>
+<h1 class="display-s">${esc(u.title)}</h1>
 <p class="lede">${esc(u.summary)}</p>
+<p class="meta muted small">Added <time datetime="${u.added}">${niceDate(u.added)}</time> · <a href="#prompt">Jump to the prompt ↓</a></p>
+</div></div></header>
+<div class="wrap article-grid">
+${toc(tocItems)}
+<article class="article">
 <div class="callout"><strong>The job:</strong> ${esc(u.job)}</div>
-<h2>What AI actually does here</h2><ul>${u.whatAIDoes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-<h2>Tools to look at</h2><ul>${u.tools.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+${u.section === 'make-money-with-ai' ? `<div class="glance"><div><span>Effort</span><p>${esc(u.effort)}</p></div><div><span>Cost to start</span><p>${esc(u.startCost)}</p></div></div>${moneyDisclaimer}` : ''}
+<h2 id="what">What AI actually does here</h2><ul>${u.whatAIDoes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+<h2 id="tools">Tools to look at</h2><ul>${u.tools.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
 <p class="muted small">Named tools are examples, not endorsements. We have no paid relationships with them at the moment; see our <a href="/disclosure">disclosure</a>.</p>
-<h2>What you need first</h2><ul>${u.needFirst.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-<h2>How to measure ROI</h2><ul>${u.roi.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-<p><a class="btn btn-ghost btn-sm" href="/roi-calculator">Run the numbers in the ROI calculator →</a></p>
-<h2>What the evidence says</h2><p>${esc(u.evidence)}</p>
-<h2>Ready-to-use prompt</h2>
-<p class="muted small">Replace the [BRACKETS]. Only paste data you’re allowed to share with the tool you’re using.</p>
-<div class="prompt-wrap"><button class="copy btn btn-sm" type="button">Copy prompt</button><pre class="prompt"><code>${esc(u.prompt)}</code></pre></div>
-<h2>Sources</h2>${sourceList(u.sources)}
+<h2 id="first">What you need first</h2><ul>${u.needFirst.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+<h2 id="measure">${esc(roiLabel)}</h2><ul>${u.roi.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+${u.section === 'make-money-with-ai' ? '' : '<p><a class="btn btn-ghost btn-sm" href="/roi-calculator">Run the numbers in the ROI calculator →</a></p>'}
+<h2 id="evidence">What the evidence says</h2><p>${esc(u.evidence)}</p>
+${promptBlock(u.prompt)}
+<h2 id="sources">Sources</h2>${sourceList(u.sources)}
 <p class="muted small">Last reviewed ${TODAY}. Spotted something out of date? We’ll add a feedback route at launch.</p>
-${related.length ? `<h2>Related use cases</h2><div class="grid">${related.map(card).join('')}</div>` : ''}
-</article>${signup('uc-signup')}`,
+</article></div>
+${related.length ? `<section class="band-soft"><div class="wrap section"><h2>Related use cases</h2><div class="grid">${related.map(card).join('')}</div></div></section>` : ''}
+${signup('uc-signup')}`,
   });
 }
 
 // ---------- Guides ----------
 page({
-  path: '/guides', title: 'Plain-English guides to AI agents, prompting and ROI',
-  description: 'Short, practical guides: what an AI agent really is, how to prompt well, and how to measure whether AI pays back.',
+  path: '/guides', title: 'Plain-English guides to AI agents, prompting, safety and ROI',
+  description: 'Short, practical guides: what an AI agent really is, how to prompt well, how to use agents safely and how to measure whether AI pays back.',
   jsonld: [crumbsLd([['Home', '/'], ['Guides', '/guides']])],
-  body: `<section class="wrap section">${crumbsHtml([['Home', '/'], ['Guides', '/guides']])}<h1>Guides</h1><p class="lede">Start here if “agents” and “prompting” still feel fuzzy.</p><div class="grid">${guides.map((g) => `<a class="card" href="/guides/${g.slug}"><span class="tag">Guide</span><h3>${esc(g.title)}</h3><p>${esc(g.summary)}</p></a>`).join('')}</div></section>`,
+  body: `<section class="wrap section">${crumbsHtml([['Home', '/'], ['Guides', '/guides']])}<p class="eyebrow">Guides</p><h1 class="display-s">Guides</h1><p class="lede">Start here if “agents” and “prompting” still feel fuzzy, or if you’re about to give an agent access to real systems.</p>
+<h2 class="list-h">Getting started</h2><div class="grid">${guides.filter((g) => !g.section).map(guideCard).join('')}</div>
+<h2 class="list-h">Use agents safely</h2><div class="grid">${guides.filter((g) => g.section === 'use-agents-safely').map(guideCard).join('')}</div></section>`,
 });
 for (const g of guides) {
-  const crumbs = [['Home', '/'], ['Guides', '/guides'], [g.title, `/guides/${g.slug}`]];
+  const s = g.section ? secBy[g.section] : null;
+  const crumbs = s ? [['Home', '/'], [s.name, `/${s.slug}`], [g.title, `/guides/${g.slug}`]] : [['Home', '/'], ['Guides', '/guides'], [g.title, `/guides/${g.slug}`]];
+  const more = s ? guides.filter((x) => x.section === g.section && x.slug !== g.slug) : guides.filter((x) => !x.section && x.slug !== g.slug);
   page({
-    path: `/guides/${g.slug}`, title: g.title, description: g.summary, type: 'article',
-    jsonld: [crumbsLd(crumbs), { '@context': 'https://schema.org', '@type': 'Article', headline: g.title, description: g.summary, inLanguage: 'en-GB', dateModified: TODAY, author: { '@type': 'Organization', name: NAME }, citation: g.sources.map((k) => sources[k].url) }],
-    body: `<article class="wrap narrow section prose">${crumbsHtml(crumbs)}<span class="tag">Guide</span><h1>${esc(g.title)}</h1><p class="lede">${esc(g.summary)}</p>${g.body}<h2>Sources</h2>${sourceList(g.sources)}</article>${signup('guide-signup')}`,
+    path: `/guides/${g.slug}`, title: g.title, description: g.summary, type: 'article', progress: true,
+    jsonld: [crumbsLd(crumbs), { '@context': 'https://schema.org', '@type': 'Article', headline: g.title, description: g.summary, inLanguage: 'en-GB', datePublished: day(g.added), dateModified: TODAY, author: { '@type': 'Organization', name: NAME }, publisher: { '@type': 'Organization', name: NAME, logo: { '@type': 'ImageObject', url: SITE + '/favicon.svg' } }, ...(s ? { articleSection: s.name } : {}), citation: g.sources.map((k) => sources[k].url), mainEntityOfPage: `${SITE}/guides/${g.slug}` }],
+    body: `<header class="article-hero"><div class="wrap narrow">${crumbsHtml(crumbs)}<div class="tags"><span class="tag tag-guide">${s ? esc(s.name) : 'Guide'}</span></div><h1 class="display-s">${esc(g.title)}</h1><p class="lede">${esc(g.summary)}</p>${g.prompt ? '<p class="meta muted small"><a href="#prompt">Jump to the prompt ↓</a></p>' : ''}</div></header>
+<div class="wrap narrow"><article class="article prose">${g.body}${g.prompt ? promptBlock(g.prompt, 'A prompt to help you do this') : ''}<h2>Sources</h2>${sourceList(g.sources)}</article></div>
+${more.length ? `<section class="band-soft"><div class="wrap section"><h2>Keep reading</h2><div class="grid">${more.map(guideCard).join('')}</div></div></section>` : ''}
+${signup('guide-signup')}`,
   });
 }
 
@@ -196,7 +311,7 @@ page({
   description: 'Work out the monthly saving and payback period of an AI tool or agent from hours saved, team size, hourly cost, tool cost and set-up time.',
   jsonld: [crumbsLd([['Home', '/'], ['ROI calculator', '/roi-calculator']]), { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'AI ROI calculator', applicationCategory: 'BusinessApplication', operatingSystem: 'Any', offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' }, url: SITE + '/roi-calculator' }],
   body: `<section class="wrap section">${crumbsHtml([['Home', '/'], ['ROI calculator', '/roi-calculator']])}
-<h1>AI ROI calculator</h1><p class="lede">A quick, honest estimate of whether an AI use case pays back. Everything runs in your browser and nothing is stored or sent.</p>
+<p class="eyebrow">Free tool</p><h1 class="display-s">AI ROI calculator</h1><p class="lede">A quick, honest estimate of whether an AI use case pays back. Everything runs in your browser and nothing is stored or sent.</p>
 <div class="calc">
 <form id="roi" class="calc-form" novalidate>
 <label>Hours saved per person per week<input type="number" name="hours" min="0" step="0.5" value="3"></label>
@@ -232,7 +347,7 @@ page({
 page({
   path: '/newsletter', title: 'Newsletter: one useful AI use case a week',
   description: 'Join the waiting list for a short weekly email with one tested AI use case, tools, a prompt and how to measure ROI.',
-  body: `<section class="wrap narrow section"><h1>The weekly use case</h1><p class="lede">One practical AI use case each week: the job, the tools, a ready-to-use prompt and how to tell if it pays back. Written in plain English, with sources.</p>
+  body: `<section class="wrap narrow section"><p class="eyebrow">Newsletter</p><h1 class="display-s">The weekly use case</h1><p class="lede">One practical AI use case each week: the job, the tools, a ready-to-use prompt and how to tell if it pays back. Written in plain English, with sources.</p>
 <ul><li>No hype, no “10 tools that will change your life”.</li><li>Sponsored items, when we have them, will always be clearly labelled.</li><li>Unsubscribe in one click.</li></ul></section>${signup('nl-signup')}`,
 });
 
@@ -241,9 +356,9 @@ const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are
 page({
   path: '/packs', title: PACKS_ON_SALE ? 'Prompt and agent-config packs' : 'Prompt and agent-config packs (coming soon)',
   description: 'Tested, ready-to-use prompt and agent-configuration packs for specific jobs and industries.',
-  body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1>Prompt and agent-config packs</h1>
+  body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1 class="display-s">Prompt and agent-config packs</h1>
 <p class="lede">The free library shows you what’s possible. A pack gives you the complete, tested kit for a job: a set of prompts, agent and tool configurations, a business-case worksheet and a checklist of controls.</p>
-<div class="grid packs">${packs.map((p) => `<div class="card pack"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
+<div class="grid packs">${packs.map((p) => `<div class="card pack reveal"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
 ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
 <p class="muted">Payments are processed securely by Stripe. We never see your card details.</p></section>`,
 });
@@ -311,7 +426,7 @@ page({
 });
 
 // ---------- 404 ----------
-write('404.html', `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | ${NAME}</title><meta name="robots" content="noindex"><link rel="stylesheet" href="/styles.css"></head><body><main class="wrap narrow section"><h1>Page not found</h1><p>That page doesn’t exist (yet). Try the <a href="/use-cases">use-case library</a> or go <a href="/">home</a>.</p></main></body></html>`);
+write('404.html', `<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Page not found | ${NAME}</title><meta name="robots" content="noindex"><meta name="color-scheme" content="light dark"><link rel="stylesheet" href="/styles.css"></head><body><main class="wrap narrow section"><p class="eyebrow">404</p><h1 class="display-s">Page not found</h1><p>That page doesn’t exist (yet). Try the <a href="/use-cases">use-case library</a> or go <a href="/">home</a>.</p></main></body></html>`);
 
 // ---------- robots, sitemap, llms.txt ----------
 write('robots.txt', PREVIEW
@@ -321,6 +436,12 @@ write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="htt
 write('llms.txt', `# ${NAME}
 
 > A free, UK-based library of practical AI use cases organised by job and industry. Each entry gives the job, what AI does, tool types and named example tools, prerequisites (data and controls), how to measure ROI, a ready-to-use prompt and public sources. Vendor claims are labelled; no statistics are invented.
+
+## Sections
+${sections.map((x) => `- [${x.name}](${SITE}/${x.slug}): ${x.intro}`).join('\n')}
+- [Latest additions](${SITE}/latest): every new use case and guide, newest first. RSS: ${SITE}/feed.xml
+
+Note on "Make money with AI": entries describe effort, start-up cost and rules (HMRC, ASA). They make no income promises and contain no earnings figures.
 
 ## Use cases
 ${useCases.map((u) => `- [${u.title}](${SITE}/use-cases/${u.slug}): ${u.summary}`).join('\n')}
@@ -332,8 +453,33 @@ ${guides.map((g) => `- [${g.title}](${SITE}/guides/${g.slug}): ${g.summary}`).jo
 - [AI ROI calculator](${SITE}/roi-calculator): monthly saving and payback period from hours saved, people, hourly cost, tool cost and set-up time. Time saved only counts if redeployed.
 
 ## Optional
+- [RSS feed](${SITE}/feed.xml)
 - [About](${SITE}/about)
 - [Sponsor and affiliate disclosure](${SITE}/disclosure)
+`);
+
+// ---------- RSS feed ----------
+const xml = (t) => esc(t).replace(/'/g, '&apos;');
+const rfc822 = (iso) => new Date(iso).toUTCString();
+write('feed.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>${NAME}: latest AI use cases and guides</title>
+<link>${SITE}/latest</link>
+<atom:link href="${SITE}/feed.xml" rel="self" type="application/rss+xml"/>
+<description>New practical AI use cases and guides: make money with AI, save time and money, and use agents safely. Plain English, sourced, no invented stats.</description>
+<language>en-gb</language>
+<lastBuildDate>${rfc822(entries[0].added)}</lastBuildDate>
+${entries.map((e) => `<item>
+<title>${xml(e.title)}</title>
+<link>${SITE}${e.path}</link>
+<guid isPermaLink="true">${SITE}${e.path}</guid>
+<pubDate>${rfc822(e.added)}</pubDate>
+<category>${xml(e.cat)}</category>
+<description>${xml(e.summary)}</description>
+</item>`).join('\n')}
+</channel>
+</rss>
 `);
 
 // ---------- static assets ----------

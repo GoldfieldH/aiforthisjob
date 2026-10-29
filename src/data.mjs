@@ -1,5 +1,6 @@
 // Content for AIForThisJob. British English. Public sources only.
 // Rule: never invent statistics. Vendor claims are labelled as such.
+import { newSources, newCategories, newUseCases, newGuides, sections as sectionList } from './data-sections.mjs';
 
 export const categories = [
   { slug: 'customer-support', name: 'Customer support', blurb: 'Answer customers faster without losing the human touch.' },
@@ -11,6 +12,7 @@ export const categories = [
   { slug: 'gaming', name: 'Gaming and indie dev', blurb: 'Concepts, quest text and game-jam speed.' },
   { slug: 'investment-operations', name: 'Investment operations', blurb: 'Reconciliations, trade exceptions, onboarding and the controls around them.' },
 ];
+categories.push(...newCategories);
 
 const S = {
   nber: { title: 'Brynjolfsson, Li and Raymond, "Generative AI at Work", NBER Working Paper 31161', url: 'https://www.nber.org/papers/w31161', kind: 'Independent research' },
@@ -51,9 +53,12 @@ const S = {
   gresham: { title: 'Gresham (product page)', url: 'https://www.greshamtech.com/', kind: 'Vendor page' },
   fenergo: { title: 'Fenergo (product page)', url: 'https://www.fenergo.com/', kind: 'Vendor page' },
 };
+Object.assign(S, newSources);
 export const sources = S;
+export const sections = sectionList;
+const T_MVP = '2026-10-29T00:14:53Z';
 
-export const useCases = [
+const baseUseCases = [
   {
     slug: 'draft-customer-email-replies', cat: 'customer-support',
     title: 'Draft replies to customer emails',
@@ -583,7 +588,7 @@ You are not making a risk decision. Never fill gaps with assumptions.`,
   },
 ];
 
-export const guides = [
+const baseGuides = [
   {
     slug: 'what-is-an-ai-agent',
     title: 'What is an AI agent? A plain-English guide',
@@ -659,4 +664,13 @@ Finally, list anything you were unsure about.</code></pre>
 `,
     sources: ['boe', 'govAdoption', 'gartner'],
   },
+];
+
+export const useCases = [
+  ...baseUseCases.map((u) => ({ section: 'save-time-and-money', added: T_MVP, ...u })),
+  ...newUseCases,
+];
+export const guides = [
+  ...baseGuides.map((g) => ({ added: T_MVP, ...g })),
+  ...newGuides,
 ];

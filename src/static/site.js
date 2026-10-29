@@ -1,3 +1,4 @@
+window.__aiftj = true;
 // Newsletter signup: double opt-in via /api/subscribe (Resend). Falls back gracefully if not configured yet.
 document.querySelectorAll('.newsletter-form').forEach((f) => {
   f.addEventListener('submit', async (e) => {
@@ -33,7 +34,8 @@ document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', as
 // Use-case filter
 const grid = document.getElementById('uc-grid');
 if (grid) document.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
-  document.querySelectorAll('.chip').forEach((x) => x.classList.remove('active')); c.classList.add('active');
+  document.querySelectorAll('.chip').forEach((x) => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
+  c.classList.add('active'); c.setAttribute('aria-pressed', 'true');
   const f = c.dataset.filter;
   grid.querySelectorAll('.card').forEach((card) => { card.style.display = f === 'all' || card.dataset.cat === f ? '' : 'none'; });
 }));
@@ -61,3 +63,49 @@ if (roi) {
   };
   roi.addEventListener('input', calc); calc();
 }
+
+// ---------- Motion: scroll reveal, parallax fallback, progress fallback, TOC highlight ----------
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reveals = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)) { reveals.forEach((el) => el.classList.add('in', 'done')); }
+  else {
+    const io = new IntersectionObserver((list) => list.forEach((e) => {
+      if (!e.isIntersecting) return;
+      const el = e.target; el.classList.add('in'); io.unobserve(el);
+      const done = () => el.classList.add('done');
+      el.addEventListener('transitionend', done, { once: true }); setTimeout(done, 1600);
+    }), { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+    reveals.forEach((el) => io.observe(el));
+  }
+  const cssScroll = window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()');
+  // Parallax fallback for browsers without scroll-driven animations (transform only; no layout work)
+  const layers = [...document.querySelectorAll('.layers .layer')];
+  if (!reduce && !cssScroll && layers.length) {
+    let ticking = false, visible = true;
+    const host = layers[0].closest('.hero, .section-hero');
+    if (host && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(host);
+    const update = () => { ticking = false; if (!visible) return; const y = scrollY; layers.forEach((l) => l.style.setProperty('--y', (y * parseFloat(l.dataset.speed || 0.3)).toFixed(1) + 'px')); };
+    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  }
+  // Reading progress fallback
+  const bar = document.querySelector('.progress span');
+  if (bar && !cssScroll) {
+    let t = false;
+    const upd = () => { t = false; const h = document.documentElement.scrollHeight - innerHeight; bar.style.setProperty('--p', h > 0 ? Math.min(1, scrollY / h).toFixed(4) : 0); };
+    addEventListener('scroll', () => { if (!t) { t = true; requestAnimationFrame(upd); } }, { passive: true }); upd();
+  }
+  // Highlight the current section in the table of contents
+  const toc = document.querySelector('.toc');
+  if (toc && 'IntersectionObserver' in window) {
+    const links = new Map([...toc.querySelectorAll('li a[href^="#"]')].map((a) => [a.getAttribute('href').slice(1), a]));
+    const heads = [...links.keys()].map((id) => document.getElementById(id)).filter(Boolean);
+    const tio = new IntersectionObserver((list) => list.forEach((e) => {
+      if (e.isIntersecting) { links.forEach((a) => a.classList.remove('active')); const a = links.get(e.target.id); if (a) a.classList.add('active'); }
+    }), { rootMargin: '-20% 0px -70% 0px' });
+    heads.forEach((h) => tio.observe(h));
+  }
+  // Opening the prompt via a #prompt link expands it
+  const openPrompt = () => { if (location.hash === '#prompt') { const d = document.querySelector('.prompt-details'); if (d) d.open = true; } };
+  addEventListener('hashchange', openPrompt); openPrompt();
+})();
