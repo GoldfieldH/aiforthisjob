@@ -350,13 +350,14 @@ page({
 });
 
 // ---------- Packs ----------
-const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital content you download straight after payment. When you check out, you’ll be asked to agree that the download starts immediately and that you then lose your 14-day right to cancel (Consumer Contracts Regulations 2013). This doesn’t affect your statutory rights if a pack is faulty or not as described. Prices include any VAT due. See our <a href="/terms">terms</a>.</p>`;
+const buyNote = `<p class="buy-note">By buying you agree to immediate access to this digital download and that you lose your 14-day right to cancel once the download starts. Payments are processed by Stripe. <a href="/terms#right-to-cancel">Terms</a></p>`;
+const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital downloads you get straight after payment. By buying you agree to immediate access and that you lose your 14-day right to cancel once the download starts (Consumer Contracts Regulations 2013). This doesn’t affect your rights if a pack is faulty or not what you ordered. Stripe is the seller of record and handles VAT. See our <a href="/terms#right-to-cancel">terms</a>.</p>`;
 page({
   path: '/packs', title: PACKS_ON_SALE ? 'Prompt and agent-config packs' : 'Prompt and agent-config packs (coming soon)',
   description: 'Tested, ready-to-use prompt and agent-configuration packs for specific jobs and industries.',
   body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1 class="display-s">Prompt and agent-config packs</h1>
 <p class="lede">The free library shows you what’s possible. A pack gives you the complete, tested kit for a job: a set of prompts, agent and tool configurations, a business-case worksheet and a checklist of controls.</p>
-<div class="grid packs">${packs.map((p) => `<div class="card pack reveal"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
+<div class="grid packs">${packs.map((p) => `<div class="card pack reveal"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>${buyNote}` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
 ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
 <p class="muted">Payments are processed securely by Stripe. We never see your card details.</p></section>`,
 });
@@ -369,10 +370,11 @@ page({
 <p class="muted">Draft: to be reviewed before packs go on sale.</p>
 <h2>Who we are</h2><p>${NAME} is run from the UK. Contact: ${SUPPORT}.</p>
 <h2>What you’re buying</h2><p>Packs are digital content (documents and files) for your own use within your organisation. Please don’t resell or republish them.</p>
-<h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Payment is taken by Stripe at checkout.</p>
-<h2>Your right to cancel</h2><p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 you normally have 14 days to cancel. For digital content supplied immediately, you’ll be asked at checkout to agree that supply starts straight away and to acknowledge that you then lose that right to cancel. We’ll confirm this in your receipt email.</p>
-<h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email ${SUPPORT} and we’ll fix it, replace it or refund you.
-<h2>Lost or expired download link</h2><p>Download links last 7 days. If yours has expired, email ${SUPPORT} with your order reference and we’ll send a new one.</p></p>
+<h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Payments are processed by Stripe. Stripe acts as the seller of record through Stripe Managed Payments, which means Stripe sells the pack to you on our behalf and works out, collects and pays any VAT due.</p>
+<h2 id="right-to-cancel">Digital downloads and your right to cancel</h2><p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 you normally have 14 days to cancel an online purchase. Packs are digital downloads that you can access straight after payment. By buying a pack you agree to get immediate access to it, and you accept that you lose your 14-day right to cancel once the download starts. We say this next to every Buy button and repeat it in your delivery email.</p>
+<p>This doesn’t affect your other rights. If a file is faulty, won’t open, or isn’t the pack you ordered, email ${SUPPORT} and we’ll fix it, send the right file or refund you.</p>
+<h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email ${SUPPORT} and we’ll fix it, replace it or refund you.</p>
+<h2>Lost or expired download link</h2><p>Download links last 7 days. If yours has expired, email ${SUPPORT} with your order reference and we’ll send a new one.</p>
 <h2>No professional advice</h2><p>Packs are practical templates, not financial, legal, regulatory or professional advice. Check anything important against your own organisation’s policies.</p></section>`,
 });
 
