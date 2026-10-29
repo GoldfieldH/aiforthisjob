@@ -8,6 +8,11 @@ const PREVIEW = process.env.PREVIEW !== '0'; // default: preview mode = noindex 
 const OUT = new URL('../dist/', import.meta.url).pathname;
 const NAME = 'AIForThisJob';
 const SUPPORT = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
+// The company that runs the site and supplies the packs. Licence number as given on its Services Licence.
+const COMPANY = 'Kaloozo FZ-LLC';
+const COMPANY_ADDRESS = 'Compass Building, Al Hulaila Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates';
+const COMPANY_LICENCE = '47037196';
+const LEGAL_UPDATED = '29 October 2026';
 // Dates shown and sent to search engines come from content (added / optional updated), never the build date,
 // so a rebuild doesn't fake freshness (Google: dates and sitemap lastmod must reflect real changes).
 const OG_IMAGE = { url: '/og/default.png', width: 1200, height: 630, alt: 'AIForThisJob: the right AI for the job, and how to tell if it pays back' };
@@ -118,11 +123,11 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 </div>${progress ? '<div class="progress" aria-hidden="true"><span></span></div>' : ''}</header>
 <main id="main">${body}</main>
 <footer class="site-footer"><div class="wrap footer-grid">
-<div class="footer-brand"><a class="logo" href="/"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a><p class="muted">Which AI for which job, with honest notes on what it takes and whether it pays back. Made in the UK.</p></div>
+<div class="footer-brand"><a class="logo" href="/"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a><p class="muted">Which AI for which job, with honest notes on what it takes and whether it pays back. Written for UK readers.</p></div>
 <div><h2 class="footer-h">Explore</h2>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
 <div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
 <div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
-</div><div class="wrap fine">© ${new Date().getFullYear()} ${NAME}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
+</div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}, which also supplies our packs. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 <script src="/site.js" defer></script>
 </body>
 </html>`;
@@ -139,7 +144,7 @@ const card = (u, i = 0) => `<a class="card reveal" style="--i:${i % 6}" href="/u
 const guideCard = (g, i = 0) => `<a class="card reveal" style="--i:${i % 6}" href="/guides/${g.slug}"><span class="tag tag-guide">Guide</span><h3>${esc(g.title)}</h3><p>${esc(g.summary)}</p><span class="more">Read the guide <span aria-hidden="true">→</span></span></a>`;
 
 const signup = (id = 'signup') => `<section class="signup band-dark" id="${id}" aria-labelledby="${id}-h"><div class="wrap signup-inner reveal">
-<div><p class="eyebrow">Newsletter</p><h2 id="${id}-h">One useful AI use case a week.</h2><p>A short email with a tested use case, the tools, a ready-to-use prompt and how to tell whether it pays back. No hype.</p></div>
+<div><p class="eyebrow">Newsletter</p><h2 id="${id}-h">One useful AI use case a week.</h2><p>A short email with a practical use case, the tools, a ready-to-use prompt and how to tell whether it pays back. No hype.</p></div>
 <form class="newsletter-form" novalidate>
 <label for="${id}-email" class="sr">Email address</label>
 <input id="${id}-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
@@ -169,8 +174,8 @@ const entries = [
 ].sort((a, b) => b.added.localeCompare(a.added) || b.order - a.order);
 
 // ---------- Home ----------
-const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORG_ID, name: NAME, url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/logo.png', width: 512, height: 512 }, email: SUPPORT_EMAIL, description: 'An independent, UK-based library of practical AI use cases organised by job and industry.', areaServed: 'GB', contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: SUPPORT_EMAIL, availableLanguage: 'en-GB' } };
-const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': WEBSITE_ID, name: NAME, url: SITE + '/', inLanguage: 'en-GB', description: 'A free library of AI use cases organised by job and industry.', publisher: { '@id': ORG_ID } };
+const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORG_ID, name: NAME, url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/logo.png', width: 512, height: 512 }, email: SUPPORT_EMAIL, description: 'Practical, realistic AI use cases organised by job and industry: what to try, what to keep a human on and how to tell it pays back.', parentOrganization: { '@type': 'Organization', name: COMPANY }, areaServed: 'GB', contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: SUPPORT_EMAIL, availableLanguage: 'en-GB' } };
+const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': WEBSITE_ID, name: NAME, url: SITE + '/', inLanguage: 'en-GB', description: 'You’ve got the AI tools. Now what? A free library of practical AI use cases organised by job and industry.', publisher: { '@id': ORG_ID } };
 const orgRef = { '@type': 'Organization', '@id': ORG_ID, name: NAME, url: SITE + '/' };
 const articleLd = ({ headline, description, path, added, updated, extra = {} }) => ({
   '@context': 'https://schema.org', '@type': 'Article', headline, description, inLanguage: 'en-GB',
@@ -184,14 +189,14 @@ const sectionExamples = {
 };
 const panelTone = { 'make-money-with-ai': 'band-light', 'save-time-and-money': 'band-soft', 'use-agents-safely': 'band-dark' };
 page({
-  path: '/', title: `AI use cases by job, with prompts and ROI | ${NAME}`, lastmod: latestOf([...useCases, ...guides]),
-  description: 'A free, plain-English library of AI use cases: ways to make money with AI, save time and money, and use agents safely. Each with tools, a ready-to-use prompt and how to measure ROI.',
+  path: '/', title: 'You’ve got the AI tools. Now what? AI use cases by job', lastmod: latestOf([...useCases, ...guides]),
+  description: 'You’ve got the AI tools. Now what? Practical, realistic ideas for the job you actually do, including what to try and what to keep a human on.',
   jsonld: [orgLd, siteLd], bodyClass: 'home',
   body: `
 <section class="hero">${layers}<div class="wrap hero-inner">
 <p class="eyebrow">Free AI use-case library</p>
-<h1 class="display">The right AI for the job.<br><span class="grad">And proof it pays.</span></h1>
-<p class="lede">Plain-English playbooks for real work: what AI actually does, which tools to look at, what you need first, a prompt to copy and how to measure the return.</p>
+<h1 class="display">You’ve got the AI tools.<br><span class="grad">Now what?</span></h1>
+<p class="lede">Practical, realistic ideas for the job you actually do, including what’s sensible to try and what to keep a human on. Each playbook has the tools to look at, what you need first, a prompt to copy and how to measure the return.</p>
 <div class="hero-cta"><a class="btn btn-lg" href="/use-cases">Browse use cases</a><a class="btn btn-lg btn-ghost" href="/roi-calculator">Work out your ROI</a></div>
 <ul class="trust"><li>Sources on every entry</li><li>Vendor claims labelled</li><li>No invented stats</li></ul>
 </div></section>
@@ -395,40 +400,43 @@ page({
 // ---------- Newsletter ----------
 page({
   path: '/newsletter', title: 'Newsletter: one useful AI use case a week',
-  description: 'Join the waiting list for a short weekly email with one tested AI use case, tools, a prompt and how to measure ROI.',
+  description: 'Join the waiting list for a short weekly email with one practical AI use case, tools, a prompt and how to measure ROI.',
   body: `<section class="wrap narrow section"><p class="eyebrow">Newsletter</p><h1 class="display-s">The weekly use case</h1><p class="lede">One practical AI use case each week: the job, the tools, a ready-to-use prompt and how to tell if it pays back. Written in plain English, with sources.</p>
 <ul><li>No hype, no “10 tools that will change your life”.</li><li>Sponsored items, when we have them, will always be clearly labelled.</li><li>Unsubscribe in one click.</li></ul></section>${signup('nl-signup')}`,
 });
 
 // ---------- Packs ----------
-const buyNote = `<p class="buy-note">By buying you agree to immediate access to this digital download and that you lose your 14-day right to cancel once the download starts. Payments are processed by Stripe. <a href="/terms#right-to-cancel">Terms</a></p>`;
-const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital downloads you get straight after payment. By buying you agree to immediate access and that you lose your 14-day right to cancel once the download starts (Consumer Contracts Regulations 2013). This doesn’t affect your rights if a pack is faulty or not what you ordered. Stripe is the seller of record and handles VAT. See our <a href="/terms#right-to-cancel">terms</a>.</p>`;
+const buyNote = `<p class="buy-note">By buying you agree to immediate access to this digital download and that you lose your 14-day right to cancel once the download starts. Payment is handled by Stripe. <a href="/terms#right-to-cancel">Terms</a></p>`;
+const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital downloads you get straight after payment. By buying you agree to immediate access and that you lose your 14-day right to cancel once the download starts (Consumer Contracts Regulations 2013). This doesn’t affect your rights if a pack is faulty or not what you ordered. Prices include any VAT due. Packs are supplied by ${COMPANY}; payment goes through Stripe’s Managed Payments service, where Link (part of Stripe) is the merchant of record and handles VAT. See our <a href="/terms#right-to-cancel">terms</a>.</p>`;
 page({
   path: '/packs', title: PACKS_ON_SALE ? 'AI prompt and agent-config packs for your job' : 'Prompt and agent-config packs (coming soon)',
-  description: 'Tested, ready-to-use AI prompt and agent-configuration packs for specific jobs and industries: customer email replies, meeting admin and investment operations.',
+  description: 'Ready-to-use AI prompt and set-up packs for specific jobs: customer email replies, meeting admin and investment operations.',
   // Product + Offer only when the packs are really on sale, and only with facts shown on the page (name, description, price).
   jsonld: [crumbsLd([['Home', '/'], ['Packs', '/packs']]), ...(PACKS_ON_SALE ? packs.map((p) => ({ '@context': 'https://schema.org', '@type': 'Product', name: p.name, description: p.blurb, image: SITE + OG_IMAGE.url, brand: { '@type': 'Brand', name: NAME }, category: 'Digital download', offers: { '@type': 'Offer', url: `${SITE}/packs`, price: p.price.replace(/[^0-9.]/g, ''), priceCurrency: 'GBP', availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition' } })) : [])],
   body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1 class="display-s">Prompt and agent-config packs</h1>
-<p class="lede">The free library shows you what’s possible. A pack gives you the complete, tested kit for a job: a set of prompts, agent and tool configurations, a business-case worksheet and a checklist of controls.</p>
+<p class="lede">The free library shows you what’s possible. A pack gives you a ready-made kit for one job: a set of prompts plus the templates, set-up notes and checklists listed on each pack below. Only the Investment Ops pack includes an ROI business-case worksheet.</p>
 <div class="grid packs">${packs.map((p) => `<div class="card pack reveal"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>${buyNote}` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
 ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
-<p class="muted">Payments are processed securely by Stripe. We never see your card details.</p></section>`,
+<p class="muted">Packs are supplied by ${COMPANY}. Payments are processed securely by Stripe. We never see your card details.</p></section>`,
 });
 
 // ---------- Terms ----------
 page({
   path: '/terms', title: 'Terms of sale',
-  description: 'Terms of sale for AIForThisJob digital packs, including your cancellation rights.',
+  description: 'Terms of sale for AIForThisJob digital packs: who supplies them, how payment and VAT work, your cancellation rights and what to do if something’s wrong.',
   body: `<section class="wrap narrow section prose"><h1>Terms of sale</h1>
-<p class="muted">Draft: to be reviewed before packs go on sale.</p>
-<h2>Who we are</h2><p>${NAME} is run from the UK. Contact: ${SUPPORT}.</p>
+<p class="muted">Last updated ${LEGAL_UPDATED}.</p>
+<h2>Who we are</h2><p>${NAME} is run by ${COMPANY}, ${COMPANY_ADDRESS} (Services Licence number ${COMPANY_LICENCE}). ${COMPANY} supplies the packs sold on this site. In these terms, “we” and “us” mean ${COMPANY}. Contact: ${SUPPORT}.</p>
+<h2>Your legal rights</h2><p>If you buy as a consumer, nothing in these terms takes away or limits your legal rights. If you live in the UK, that includes your rights under the Consumer Rights Act 2015 and the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013.</p>
 <h2>What you’re buying</h2><p>Packs are digital content (documents and files) for your own use within your organisation. Please don’t resell or republish them.</p>
-<h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Payments are processed by Stripe. Stripe acts as the seller of record through Stripe Managed Payments, which means Stripe sells the pack to you on our behalf and works out, collects and pays any VAT due.</p>
+<h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Checkout and payment are handled by Stripe through its Managed Payments service. For the payment, Link (part of Stripe) acts as the merchant of record: it works out, collects and pays any VAT due, and sends your receipt. Your checkout and receipt may say the purchase was “sold through Link”, and your bank statement may show “LINK.COM*”. You can also contact Link support about payment questions. ${COMPANY} remains responsible for the packs themselves and for delivering them to you.</p>
 <h2 id="right-to-cancel">Digital downloads and your right to cancel</h2><p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 you normally have 14 days to cancel an online purchase. Packs are digital downloads that you can access straight after payment. By buying a pack you agree to get immediate access to it, and you accept that you lose your 14-day right to cancel once the download starts. We say this next to every Buy button and repeat it in your delivery email.</p>
 <p>This doesn’t affect your other rights. If a file is faulty, won’t open, or isn’t the pack you ordered, email ${SUPPORT} and we’ll fix it, send the right file or refund you.</p>
 <h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email ${SUPPORT} and we’ll fix it, replace it or refund you.</p>
 <h2>Lost or expired download link</h2><p>Download links last 7 days. If yours has expired, email ${SUPPORT} with your order reference and we’ll send a new one.</p>
-<h2>No professional advice</h2><p>Packs are practical templates, not financial, legal, regulatory or professional advice. Check anything important against your own organisation’s policies.</p></section>`,
+<h2>No professional advice</h2><p>Packs are practical templates, not financial, legal, regulatory or professional advice. Check anything important against your own organisation’s policies.</p>
+<h2>Complaints and disputes</h2><p>If you’re unhappy, please email ${SUPPORT} first and we’ll try to put it right. If you’re a consumer, you keep the protection of the mandatory consumer laws of the country where you live. If you live in the UK, you can bring a claim in the courts of the part of the UK where you live.</p>
+<h2>Your personal data</h2><p>Our <a href="/privacy">privacy notice</a> explains what we collect when you buy a pack and how we use it.</p></section>`,
 });
 
 // ---------- About ----------
@@ -437,7 +445,7 @@ page({
   description: 'Why AIForThisJob exists: to help people pick the right AI tool for a real job and measure honestly whether it pays back.',
   body: `<section class="wrap narrow section prose"><h1>About ${NAME}</h1>
 <p class="lede">Lots of people are being told to “use AI” without being told what for, which tool, or how to know whether it worked.</p>
-<p>${NAME} is a UK-based, independent library of practical AI use cases organised by job and industry. Each one explains what AI really does, which kinds of tools to look at, what you need in place first, a ready-to-use prompt, and how to measure the return.</p>
+<p>${NAME} is an independent library of practical AI use cases organised by job and industry, written for UK readers. Each one explains what AI really does, which kinds of tools to look at, what you need in place first, a ready-to-use prompt, and how to measure the return.</p>
 <h2 id="how-we-work">How we research and check playbooks</h2>
 <p>Each playbook starts from the job, not the tool. We read the public sources listed at the bottom of every page (regulators, government guidance, independent research and vendor documentation), note what the evidence does and doesn’t show, and write down what you need in place before you start. Every page shows the date it was added and, when it changes, the date it was updated.</p>
 <h2>Our rules</h2>
@@ -458,7 +466,7 @@ page({
   body: `<section class="wrap narrow section prose"><h1>Sponsor and affiliate disclosure</h1>
 <p><strong>Current status:</strong> we have no sponsors, paid listings or affiliate links at the moment. Tools are mentioned because they fit the job.</p>
 <h2>How we plan to make money</h2>
-<ul><li><strong>Paid packs</strong> of tested prompts and configurations.</li>
+<ul><li><strong>Paid packs</strong> of ready-to-use prompts, templates and checklists.</li>
 <li><strong>Affiliate links:</strong> some tool links may earn us a commission if you sign up. This won’t change what you pay.</li>
 <li><strong>Sponsorships and featured listings</strong> in the newsletter and directory.</li></ul>
 <h2>Our promises</h2>
@@ -469,19 +477,34 @@ page({
 
 // ---------- Privacy ----------
 page({
-  path: '/privacy', title: 'Privacy',
-  description: 'Privacy basics for AIForThisJob: what we collect (currently nothing) and how that will change at launch.',
-  body: `<section class="wrap narrow section prose"><h1>Privacy</h1>
-<p class="muted">Basic notice for the preview version. A full privacy policy will be published before we collect any personal data.</p>
-<h2>What we collect now</h2>
-<ul><li><strong>Newsletter:</strong> if you sign up, we send one confirmation email. Your address is only added to our list once you click the link in it (double opt-in). We store it with our email provider, Resend, and use it only to send the newsletter. Every email has a one-click unsubscribe link.</li>
-<li><strong>Purchases:</strong> payments are handled by Stripe, which processes your card and billing details under its own privacy policy. We receive your name, email and what you bought so we can deliver the pack and keep tax records.</li>
-<li><strong>ROI calculator:</strong> runs entirely in your browser. Nothing you enter is sent to us.</li>
-<li><strong>Cookies:</strong> we set no tracking or advertising cookies.</li>
-<li><strong>Hosting logs:</strong> our host (Vercel) may process technical data such as IP addresses to deliver and secure the site.</li></ul>
-<h2>When we launch the newsletter</h2>
-<p>We’ll collect your email address only with your consent, use it only to send the newsletter, name the email provider we use, and let you unsubscribe at any time. You’ll have your rights under UK GDPR, including access and deletion, and the right to complain to the <a href="https://ico.org.uk/" rel="noopener">Information Commissioner’s Office</a>.</p>
-<h2>Contact</h2><p>For privacy questions or to use your rights, email ${SUPPORT}.</p></section>`,
+  path: '/privacy', title: 'Privacy notice',
+  description: 'How AIForThisJob uses personal data: newsletter sign-ups, pack purchases, support emails and hosting logs, who helps us, and your rights under UK GDPR.',
+  body: `<section class="wrap narrow section prose"><h1>Privacy notice</h1>
+<p class="muted">Last updated ${LEGAL_UPDATED}.</p>
+<h2>Who we are</h2><p>${NAME} is run by ${COMPANY}, ${COMPANY_ADDRESS}. We are the controller of the personal data described here, which means we decide how it’s used. For anything about your data, email ${SUPPORT}.</p>
+<h2>What we collect and why</h2>
+<ul><li><strong>Newsletter.</strong> If you enter your email address, we send you one email asking you to confirm. We don’t store your address until you click the link in it, and the link stops working after 48 hours. Once you confirm, we keep your address on our mailing list with our email provider, Resend, and use it only to send the newsletter. Every newsletter has a one-click unsubscribe link. <em>Lawful basis: your consent, which you can withdraw at any time by unsubscribing.</em></li>
+<li><strong>Buying a pack.</strong> Stripe handles checkout and your card details; we never see them. Stripe shares the order details with us, such as your name, email address, country and what you bought. We use your email address to send your download link and your order details to help with support and to keep the business and tax records the law requires. <em>Lawful basis: to deliver what you bought (contract), and to meet our legal obligations for records.</em></li>
+<li><strong>Emails to support.</strong> If you email ${SUPPORT_EMAIL}, we receive your email address and whatever you write, and use them to reply and keep a record of what we agreed. <em>Lawful basis: our legitimate interest in answering you, or to deliver what you bought if it’s about an order.</em></li>
+<li><strong>Hosting logs.</strong> Like any website, our host records technical data such as IP addresses, browser type and the pages requested, to deliver the site and keep it secure. <em>Lawful basis: our legitimate interest in running a secure website.</em></li>
+<li><strong>ROI calculator.</strong> It runs entirely in your browser. Nothing you enter is sent to us.</li>
+<li><strong>Cookies.</strong> We don’t set any cookies, and we don’t use analytics, advertising or tracking tools.</li></ul>
+<p>We don’t sell your data, and we don’t use it for automated decisions about you.</p>
+<h2>Who helps us</h2>
+<p>We use these service providers, who process data for the purposes above:</p>
+<ul><li><strong>Stripe</strong> for checkout and payments. Through Managed Payments, Link (part of Stripe) is the merchant of record for your payment, so Stripe also uses your payment details under <a href="https://stripe.com/privacy" rel="noopener">its own privacy policy</a>.</li>
+<li><strong>Resend</strong> to send the newsletter, confirmation emails and download emails, and to hold the mailing list.</li>
+<li><strong>Vercel</strong> to host the website and store the pack files.</li>
+<li><strong>ImprovMX</strong> to forward emails sent to ${SUPPORT_EMAIL} to our mailbox.</li></ul>
+<h2>Sending data outside the UK</h2><p>${COMPANY} is based in the United Arab Emirates, and some of our service providers are based in the United States or process data there. When personal data leaves the UK, we rely on the safeguards in our providers’ data protection terms, such as contract clauses approved for transfers out of the UK. Email ${SUPPORT} if you’d like more detail.</p>
+<h2>How long we keep it</h2>
+<ul><li><strong>Newsletter:</strong> while you’re subscribed. If you unsubscribe, we may keep a record that you did, so we don’t email you again. Ask us if you want your address deleted completely.</li>
+<li><strong>Confirmation links:</strong> work for 48 hours. <strong>Download links:</strong> work for 7 days.</li>
+<li><strong>Orders and support emails:</strong> for as long as we need them for support and for the business and tax records the law requires.</li>
+<li><strong>Hosting logs:</strong> for the limited period our host keeps them.</li></ul>
+<h2>Your rights</h2><p>Under UK data protection law (UK GDPR) you have the right to ask for a copy of your data, to have it corrected or deleted, to restrict or object to how we use it, to have it moved to another service, and to withdraw your consent at any time. Email ${SUPPORT} and we’ll reply within one month.</p>
+<h2>Complaints</h2><p>If you’re unhappy with how we’ve handled your data, please tell us first at ${SUPPORT}. You also have the right to complain to the UK regulator, the <a href="https://ico.org.uk/make-a-complaint/" rel="noopener">Information Commissioner’s Office (ICO)</a>.</p>
+<h2>Changes</h2><p>If we change how we use your data, we’ll update this notice and the date at the top.</p></section>`,
 });
 
 // ---------- 404 ----------
