@@ -22,7 +22,7 @@ document.querySelectorAll('.newsletter-form').forEach((f) => {
 // Newsletter status banner after confirmation redirect
 const st = new URLSearchParams(location.search).get('status');
 if (st && location.pathname === '/newsletter') {
-  const msg = { confirmed: 'You’re subscribed. Thanks! The first email will arrive soon.', expired: 'That confirmation link has expired or isn’t valid. Please sign up again.', error: 'Sorry, we couldn’t confirm your subscription. Please try again.', unavailable: 'The newsletter isn’t live yet.' }[st];
+  const msg = { confirmed: 'You’re subscribed. Thanks! The first email will arrive soon.', expired: 'That confirmation link has expired or isn’t valid. Please sign up again.', error: 'Sorry, something went wrong on our side and we couldn’t confirm your subscription. Your link still works for 48 hours, so please try it again later.', unavailable: 'The newsletter isn’t live yet.' }[st];
   if (msg) { const d = document.createElement('div'); d.className = 'status-banner'; d.setAttribute('role', 'status'); d.textContent = msg; document.querySelector('main').prepend(d); }
 }
 // Copy prompt
