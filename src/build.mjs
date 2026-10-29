@@ -7,6 +7,13 @@ const PREVIEW = process.env.PREVIEW !== '0'; // default: preview mode = noindex 
 const OUT = new URL('../dist/', import.meta.url).pathname;
 const NAME = 'AIForThisJob';
 const TODAY = new Date().toISOString().slice(0, 10);
+// Stripe Payment Links are public URLs, set per environment in Vercel (test links now, live links at launch).
+const packs = [
+  { key: 'PACK_LINK_EMAIL', name: 'Customer Email Replies Pack', price: '£19', blurb: 'Reply-drafting prompts for common customer emails, a tone-of-voice template, an FAQ assistant set-up and escalation rules so nothing risky goes out unchecked.' },
+  { key: 'PACK_LINK_ADMIN', name: 'Meeting Notes & Admin Pack', price: '£19', blurb: 'Prompts and workflows for meeting notes and actions, inbox triage, receipts and expense categories, plus a simple checklist for what to automate first.' },
+  { key: 'PACK_LINK_INVOPS', name: 'Investment Ops AI ROI Pack', price: '£49', blurb: 'Prompts for reconciliation breaks, settlement exceptions (UK T+1) and KYC/onboarding, an ROI business-case worksheet and a governance and controls checklist.' },
+].map((p) => ({ ...p, url: (process.env[p.key] || '').trim() }));
+const PACKS_ON_SALE = packs.every((p) => /^https:\/\/buy\.stripe\.com\//.test(p.url));
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const catBy = Object.fromEntries(categories.map((c) => [c.slug, c]));
@@ -56,7 +63,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <div><a class="logo" href="/"><span class="logo-mark">AI</span>ForThisJob</a><p class="muted">Which AI tool for which job, with honest notes on what it takes and whether it pays back. Made in the UK.</p></div>
 <div><h3>Browse</h3>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
 <div><h3>Learn</h3>${guides.map((g) => `<a href="/guides/${g.slug}">${esc(g.title.split(':')[0].split('?')[0])}</a>`).join('')}<a href="/roi-calculator">ROI calculator</a></div>
-<div><h3>About</h3><a href="/about">About</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/privacy">Privacy</a></div>
+<div><h3>About</h3><a href="/about">About</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${NAME}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 <script src="/site.js" defer></script>
 </body>
@@ -77,8 +84,9 @@ const signup = (id = 'signup') => `<section class="signup" id="${id}"><div class
 <form class="newsletter-form" novalidate>
 <label for="${id}-email" class="sr">Email address</label>
 <input id="${id}-email" type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
-<button class="btn" type="submit">Join the waiting list</button>
-<p class="form-note" role="status">Coming soon: this form doesn’t collect or store anything yet.</p>
+<input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+<button class="btn" type="submit">Subscribe</button>
+<p class="form-note" role="status">We’ll email you a link to confirm. Unsubscribe any time. See our <a href="/privacy">privacy notice</a>.</p>
 </form></div></section>`;
 
 const sourceList = (keys) => `<ol class="sources">${keys.map((k) => { const s = sources[k]; return `<li><a href="${s.url}" rel="noopener" target="_blank">${esc(s.title)}</a> <span class="kind">${esc(s.kind)}</span></li>`; }).join('')}</ol>`;
@@ -229,18 +237,29 @@ page({
 });
 
 // ---------- Packs ----------
+const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital content you download straight after payment. When you check out, you’ll be asked to agree that the download starts immediately and that you then lose your 14-day right to cancel (Consumer Contracts Regulations 2013). This doesn’t affect your statutory rights if a pack is faulty or not as described. Prices include any VAT due. See our <a href="/terms">terms</a>.</p>`;
 page({
-  path: '/packs', title: 'Prompt and agent-config packs (coming soon)',
-  description: 'Tested, ready-to-use prompt and agent-configuration packs for specific jobs and industries. Coming soon.',
-  body: `<section class="wrap narrow section"><span class="tag">Coming soon</span><h1>Prompt and agent-config packs</h1>
-<p class="lede">The free library shows you what’s possible. Packs will give you the complete, tested kit for a job: a set of prompts, agent and tool configurations, a business-case worksheet and a checklist of controls.</p>
-<h2>Packs we’re planning</h2>
-<ul><li><strong>Customer support starter:</strong> reply drafting, an FAQ assistant and escalation rules.</li>
-<li><strong>Small business admin:</strong> meetings, inbox, receipts and workflow automations.</li>
-<li><strong>Vibe coder’s kit:</strong> project rules files, spec templates and debugging prompts.</li>
-<li><strong>Investment operations:</strong> reconciliations, exceptions and onboarding, plus an ROI business-case worksheet and a governance checklist.</li></ul>
-<p>Each pack will be tested before release. Prices aren’t set yet, and nothing is on sale.</p>
-<p>Want first access? <a href="/newsletter">Join the waiting list</a>.</p></section>`,
+  path: '/packs', title: PACKS_ON_SALE ? 'Prompt and agent-config packs' : 'Prompt and agent-config packs (coming soon)',
+  description: 'Tested, ready-to-use prompt and agent-configuration packs for specific jobs and industries.',
+  body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1>Prompt and agent-config packs</h1>
+<p class="lede">The free library shows you what’s possible. A pack gives you the complete, tested kit for a job: a set of prompts, agent and tool configurations, a business-case worksheet and a checklist of controls.</p>
+<div class="grid packs">${packs.map((p) => `<div class="card pack"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
+${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
+<p class="muted">Payments are processed securely by Stripe. We never see your card details.</p></section>`,
+});
+
+// ---------- Terms ----------
+page({
+  path: '/terms', title: 'Terms of sale',
+  description: 'Terms of sale for AIForThisJob digital packs, including your cancellation rights.',
+  body: `<section class="wrap narrow section prose"><h1>Terms of sale</h1>
+<p class="muted">Draft: to be reviewed before packs go on sale.</p>
+<h2>Who we are</h2><p>${NAME} is run from the UK. Contact: <a href="mailto:hello@aiforthisjob.com">hello@aiforthisjob.com</a>.</p>
+<h2>What you’re buying</h2><p>Packs are digital content (documents and files) for your own use within your organisation. Please don’t resell or republish them.</p>
+<h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Payment is taken by Stripe at checkout.</p>
+<h2>Your right to cancel</h2><p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 you normally have 14 days to cancel. For digital content supplied immediately, you’ll be asked at checkout to agree that supply starts straight away and to acknowledge that you then lose that right to cancel. We’ll confirm this in your receipt email.</p>
+<h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email us and we’ll fix it, replace it or refund you.</p>
+<h2>No professional advice</h2><p>Packs are practical templates, not financial, legal, regulatory or professional advice. Check anything important against your own organisation’s policies.</p></section>`,
 });
 
 // ---------- About ----------
@@ -282,7 +301,8 @@ page({
   body: `<section class="wrap narrow section prose"><h1>Privacy</h1>
 <p class="muted">Basic notice for the preview version. A full privacy policy will be published before we collect any personal data.</p>
 <h2>What we collect now</h2>
-<ul><li><strong>Newsletter form:</strong> a placeholder. It doesn’t send or store your email address anywhere.</li>
+<ul><li><strong>Newsletter:</strong> if you sign up, we send one confirmation email. Your address is only added to our list once you click the link in it (double opt-in). We store it with our email provider, Resend, and use it only to send the newsletter. Every email has a one-click unsubscribe link.</li>
+<li><strong>Purchases:</strong> payments are handled by Stripe, which processes your card and billing details under its own privacy policy. We receive your name, email and what you bought so we can deliver the pack and keep tax records.</li>
 <li><strong>ROI calculator:</strong> runs entirely in your browser. Nothing you enter is sent to us.</li>
 <li><strong>Cookies:</strong> we set no tracking or advertising cookies.</li>
 <li><strong>Hosting logs:</strong> our host (Vercel) may process technical data such as IP addresses to deliver and secure the site.</li></ul>

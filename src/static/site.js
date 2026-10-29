@@ -1,14 +1,29 @@
-// Newsletter placeholder: stores and sends nothing.
+// Newsletter signup: double opt-in via /api/subscribe (Resend). Falls back gracefully if not configured yet.
 document.querySelectorAll('.newsletter-form').forEach((f) => {
-  f.addEventListener('submit', (e) => {
+  f.addEventListener('submit', async (e) => {
     e.preventDefault();
     const note = f.querySelector('.form-note');
     const email = f.querySelector('input[type=email]');
+    const btn = f.querySelector('button');
     if (!email.value || !email.checkValidity()) { note.textContent = 'Please enter a valid email address.'; return; }
-    email.value = '';
-    note.textContent = 'Thanks! The newsletter isn’t live yet, so we haven’t saved your address. Please check back soon.';
+    btn.disabled = true; note.textContent = 'Sending…';
+    try {
+      const r = await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.value, website: (f.elements.website || {}).value || '' }) });
+      if (r.ok) { email.value = ''; note.textContent = 'Nearly there: check your inbox and click the link to confirm.'; }
+      else if (r.status === 503) note.textContent = 'The newsletter isn’t live yet, so we haven’t saved your address. Please check back soon.';
+      else if (r.status === 400) note.textContent = 'Please enter a valid email address.';
+      else note.textContent = 'Sorry, something went wrong. Please try again in a minute.';
+    } catch { note.textContent = 'Sorry, something went wrong. Please try again in a minute.'; }
+    btn.disabled = false;
   });
 });
+// Newsletter status banner after confirmation redirect
+const st = new URLSearchParams(location.search).get('status');
+if (st && location.pathname === '/newsletter') {
+  const msg = { confirmed: 'You’re subscribed. Thanks! The first email will arrive soon.', expired: 'That confirmation link has expired or isn’t valid. Please sign up again.', error: 'Sorry, we couldn’t confirm your subscription. Please try again.', unavailable: 'The newsletter isn’t live yet.' }[st];
+  if (msg) { const d = document.createElement('div'); d.className = 'status-banner'; d.setAttribute('role', 'status'); d.textContent = msg; document.querySelector('main').prepend(d); }
+}
 // Copy prompt
 document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
   const text = b.parentElement.querySelector('code').innerText;
