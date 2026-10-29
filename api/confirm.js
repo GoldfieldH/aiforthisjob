@@ -9,6 +9,6 @@ export default async function handler(req, res) {
   const contact = { email, unsubscribed: false };
   if (process.env.RESEND_SEGMENT_ID) contact.segments = [{ id: process.env.RESEND_SEGMENT_ID }];
   const r = await resend('/contacts', contact);
-  if (!r.ok && r.status !== 409) { console.error('resend contact failed', r.status, r.data); return go('/newsletter?status=error'); }
+  if (!r.ok && r.status !== 409) { console.error('resend contact failed', r.status, r.data, r.status === 401 || r.status === 403 ? '(key lacks contacts permission: set a full-access RESEND_CONTACTS_API_KEY)' : ''); return go('/newsletter?status=error'); }
   return go('/newsletter?status=confirmed');
 }

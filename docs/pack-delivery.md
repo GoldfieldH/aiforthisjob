@@ -25,6 +25,7 @@ Do everything in the **Stripe sandbox** first; repeat in live mode only when Gre
 | `PACK_STRIPE_IDS_INVOPS` | `plink_…,price_…` | Investment Ops AI ROI pack (`investment-ops-roi`). |
 | `PACK_LINK_EMAIL` / `_ADMIN` / `_INVOPS` | `https://buy.stripe.com/…` | Unchanged: the Buy now buttons (baked in at build time, so redeploy after changing). |
 | `RESEND_API_KEY`, `SITE_URL` | already set | `SITE_URL` builds the download link (defaults to https://www.aiforthisjob.com). |
+| `RESEND_CONTACTS_API_KEY` | needed for newsletter | A **full-access** Resend key, used only by `/api/confirm` to add contacts. `RESEND_API_KEY` can stay sending-only. |
 
 Sandbox ids (account `acct_1UVgkC5sR1r9qUgp`, test mode):
 - `PACK_STRIPE_IDS_EMAIL=plink_1UVhtC5sR1r9qUgpQZzdIXao,price_1UVhsp5sR1r9qUgp7I497Re2`
