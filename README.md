@@ -23,9 +23,9 @@ npx serve dist       # or any static file server
 | Output directory | `dist` |
 | Install command | leave default (no dependencies to install) |
 | Node.js version | 20.x or 22.x |
-| Environment variables | optional: `SITE_URL` (e.g. `https://aiforthisjob.com`) sets canonical URLs, sitemap and llms.txt. Default: `https://aiforthisjob.vercel.app` |
+| Environment variables | optional: `SITE_URL` sets canonical URLs, sitemap, feed and llms.txt. Default: `https://www.aiforthisjob.com` (the apex redirects to www). Optional `AI_TRAINING=0` makes the launch robots.txt block AI-training crawlers (search and AI answer engines stay allowed). |
 
-`vercel.json` gives clean URLs (`/about` instead of `/about.html`) and adds an `X-Robots-Tag: noindex, nofollow` header.
+`vercel.json` gives clean URLs (`/about` instead of `/about.html`), redirects `aiforthisjob.vercel.app` to `www.aiforthisjob.com`, adds security headers and an `X-Robots-Tag: noindex, nofollow` header (remove only that header at launch).
 
 ## Preview mode vs launch
 
@@ -45,3 +45,10 @@ Public sources only, never invent statistics, label vendor claims, no confidenti
 - Every use case (and each safety guide) has a "View prompt" block with a copy button.
 - `npm run check` checks internal links, anchors, JSON-LD, one-H1-per-page, and sitemap/feed/llms.txt links in `dist/`.
 - Motion is progressive enhancement: CSS scroll-driven animations with an IntersectionObserver/rAF fallback. Content stays visible without JS, and all motion is off under prefers-reduced-motion.
+
+## SEO (see `npm run check`)
+- Titles get " | AIForThisJob" only when they still fit in ~60 characters; meta descriptions are trimmed to 158 characters at a sentence or word boundary. Use-case titles include "AI"; override one with `seoTitle` on the entry.
+- Dates come from content: `added` and an optional `updated` (ISO) on each use case or guide. Set `updated` when you materially change an entry; it drives the visible "Updated" date, Article `dateModified`, `article:modified_time` and sitemap `lastmod`. The build date is never used.
+- Every page has a canonical URL, Open Graph/Twitter large-image card (`src/static/og/default.png`, 1200×630), and JSON-LD: Organization + WebSite (home, About), BreadcrumbList, Article (use cases, guides), CollectionPage/ItemList (hubs), WebApplication (ROI calculator) and Product/Offer on /packs only when packs are on sale. No FAQ/HowTo markup (Google no longer shows those rich results).
+- `npm run check` fails on duplicate titles/descriptions, descriptions over 160 characters, missing or mismatched canonicals, pages missing from the sitemap, a missing og:image file, or an indexable page in a preview build.
+- Run `npm run build:launch && npm run check` before launch to confirm the indexable output (robots.txt allows crawlers and lists the sitemap).
