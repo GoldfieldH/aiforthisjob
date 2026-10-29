@@ -4,6 +4,8 @@ A free, UK-based library of practical AI use cases organised by job and industry
 
 Static site generator with **no dependencies** (Node 18+). Content lives in `src/data.mjs`, page templates in `src/build.mjs`, CSS/JS/favicon in `src/static/`.
 
+Public contact: **support@aiforthisjob.com** (the only address used on the site, in pack emails and in the packs; set once in `lib/packs.mjs` as `SUPPORT_EMAIL`). Never put a personal address in this repo.
+
 ## Run locally
 
 ```bash

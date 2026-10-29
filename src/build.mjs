@@ -1,18 +1,16 @@
 import { mkdirSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { categories, useCases, guides, sources, sections } from './data.mjs';
+import { packs as catalogue, SUPPORT_EMAIL } from '../lib/packs.mjs';
 
 const SITE = (process.env.SITE_URL || 'https://aiforthisjob.vercel.app').replace(/\/$/, '');
 const PREVIEW = process.env.PREVIEW !== '0'; // default: preview mode = noindex until Greg approves launch
 const OUT = new URL('../dist/', import.meta.url).pathname;
 const NAME = 'AIForThisJob';
+const SUPPORT = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
 const TODAY = new Date().toISOString().slice(0, 10);
 // Stripe Payment Links are public URLs, set per environment in Vercel (test links now, live links at launch).
-const packs = [
-  { key: 'PACK_LINK_EMAIL', name: 'Customer Email Replies Pack', price: '£19', blurb: 'Reply-drafting prompts for common customer emails, a tone-of-voice template, an FAQ assistant set-up and escalation rules so nothing risky goes out unchecked.' },
-  { key: 'PACK_LINK_ADMIN', name: 'Meeting Notes & Admin Pack', price: '£19', blurb: 'Prompts and workflows for meeting notes and actions, inbox triage, receipts and expense categories, plus a simple checklist for what to automate first.' },
-  { key: 'PACK_LINK_INVOPS', name: 'Investment Ops AI ROI Pack', price: '£49', blurb: 'Prompts for reconciliation breaks, settlement exceptions (UK T+1) and KYC/onboarding, an ROI business-case worksheet and a governance and controls checklist.' },
-].map((p) => ({ ...p, url: (process.env[p.key] || '').trim() }));
+const packs = catalogue.map((p) => ({ ...p, key: p.linkEnv, url: (process.env[p.linkEnv] || '').trim() }));
 const PACKS_ON_SALE = packs.every((p) => /^https:\/\/buy\.stripe\.com\//.test(p.url));
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -83,7 +81,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <div class="footer-brand"><a class="logo" href="/"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a><p class="muted">Which AI for which job, with honest notes on what it takes and whether it pays back. Made in the UK.</p></div>
 <div><h2 class="footer-h">Explore</h2>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
 <div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
-<div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a></div>
+<div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${NAME}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 <script src="/site.js" defer></script>
 </body>
@@ -369,11 +367,12 @@ page({
   description: 'Terms of sale for AIForThisJob digital packs, including your cancellation rights.',
   body: `<section class="wrap narrow section prose"><h1>Terms of sale</h1>
 <p class="muted">Draft: to be reviewed before packs go on sale.</p>
-<h2>Who we are</h2><p>${NAME} is run from the UK. Contact: <a href="mailto:hello@aiforthisjob.com">hello@aiforthisjob.com</a>.</p>
+<h2>Who we are</h2><p>${NAME} is run from the UK. Contact: ${SUPPORT}.</p>
 <h2>What you’re buying</h2><p>Packs are digital content (documents and files) for your own use within your organisation. Please don’t resell or republish them.</p>
 <h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Payment is taken by Stripe at checkout.</p>
 <h2>Your right to cancel</h2><p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 you normally have 14 days to cancel. For digital content supplied immediately, you’ll be asked at checkout to agree that supply starts straight away and to acknowledge that you then lose that right to cancel. We’ll confirm this in your receipt email.</p>
-<h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email us and we’ll fix it, replace it or refund you.</p>
+<h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email ${SUPPORT} and we’ll fix it, replace it or refund you.
+<h2>Lost or expired download link</h2><p>Download links last 7 days. If yours has expired, email ${SUPPORT} with your order reference and we’ll send a new one.</p></p>
 <h2>No professional advice</h2><p>Packs are practical templates, not financial, legal, regulatory or professional advice. Check anything important against your own organisation’s policies.</p></section>`,
 });
 
@@ -390,7 +389,8 @@ page({
 <li><strong>Vendor claims are labelled</strong> as vendor claims.</li>
 <li><strong>Human checked.</strong> We use AI to help research and draft; a person reviews before anything is published.</li>
 <li><strong>No confidential information.</strong> Industry playbooks use public information only.</li></ul>
-<p>Nothing here is financial, legal, regulatory or professional advice. Check anything important with a qualified adviser and your own organisation’s policies.</p></section>`,
+<p>Nothing here is financial, legal, regulatory or professional advice. Check anything important with a qualified adviser and your own organisation’s policies.</p>
+<h2>Contact</h2><p>Questions, corrections or a use case you’d like covered: email ${SUPPORT}.</p></section>`,
 });
 
 // ---------- Disclosure ----------
@@ -422,7 +422,8 @@ page({
 <li><strong>Cookies:</strong> we set no tracking or advertising cookies.</li>
 <li><strong>Hosting logs:</strong> our host (Vercel) may process technical data such as IP addresses to deliver and secure the site.</li></ul>
 <h2>When we launch the newsletter</h2>
-<p>We’ll collect your email address only with your consent, use it only to send the newsletter, name the email provider we use, and let you unsubscribe at any time. You’ll have your rights under UK GDPR, including access and deletion, and the right to complain to the <a href="https://ico.org.uk/" rel="noopener">Information Commissioner’s Office</a>.</p></section>`,
+<p>We’ll collect your email address only with your consent, use it only to send the newsletter, name the email provider we use, and let you unsubscribe at any time. You’ll have your rights under UK GDPR, including access and deletion, and the right to complain to the <a href="https://ico.org.uk/" rel="noopener">Information Commissioner’s Office</a>.</p>
+<h2>Contact</h2><p>For privacy questions or to use your rights, email ${SUPPORT}.</p></section>`,
 });
 
 // ---------- 404 ----------
@@ -456,6 +457,8 @@ ${guides.map((g) => `- [${g.title}](${SITE}/guides/${g.slug}): ${g.summary}`).jo
 - [RSS feed](${SITE}/feed.xml)
 - [About](${SITE}/about)
 - [Sponsor and affiliate disclosure](${SITE}/disclosure)
+
+Contact: ${SUPPORT_EMAIL}
 `);
 
 // ---------- RSS feed ----------
