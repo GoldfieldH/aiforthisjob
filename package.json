@@ -8,6 +8,7 @@
     "build": "rm -rf dist && node src/build.mjs",
     "build:launch": "rm -rf dist && PREVIEW=0 node src/build.mjs",
     "serve": "npx --yes serve dist -l 4321",
-    "check": "node scripts/check-site.mjs"
+    "check": "node scripts/check-site.mjs",
+    "test": "node scripts/test-webhook.mjs"
   }
 }
