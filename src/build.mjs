@@ -16,6 +16,7 @@ const NAME = 'AIForThisJob';
 const SUPPORT = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
 // The company that runs the site and sells the packs. Licence number as given on its Services Licence.
 const COMPANY = 'Kaloozo FZ-LLC';
+const ONE_OFF = 'One-off payment. No subscription.';
 const COMPANY_ADDRESS = 'Compass Building, Al Hulaila Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates';
 const COMPANY_LICENCE = '47037196';
 const LEGAL_UPDATED = '30 October 2026';
@@ -134,7 +135,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
 <div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}. Packs are sold by ${COMPANY}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
-${path === '/packs' ? '' : '<a class="btn buy-fab" href="/packs">Buy packs</a>'}
+${path === '/packs' ? '' : `<a class="btn buy-fab" href="/packs"><span>Buy packs</span><span class="buy-fab-note">${ONE_OFF}</span></a>`}
 <script src="/site.js" defer></script>
 </body>
 </html>`;
@@ -422,7 +423,8 @@ page({
   jsonld: [crumbsLd([['Home', '/'], ['Packs', '/packs']]), ...(PACKS_ON_SALE ? packs.map((p) => ({ '@context': 'https://schema.org', '@type': 'Product', name: p.name, description: p.blurb, image: SITE + OG_IMAGE.url, brand: { '@type': 'Brand', name: NAME }, category: 'Digital download', offers: { '@type': 'Offer', url: `${SITE}/packs`, price: p.price.replace(/[^0-9.]/g, ''), priceCurrency: 'GBP', availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition' } })) : [])],
   body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1 class="display-s">Prompt and agent-config packs</h1>
 <p class="lede">The free library shows you what’s possible. A pack gives you a ready-made kit for one job: a set of prompts plus the templates, set-up notes and checklists listed on each pack below. Only the Investment Ops pack includes an ROI business-case worksheet.</p>
-<div class="grid packs">${packs.map((p) => `<div class="card pack reveal" id="pack-${esc(p.slug)}"><h3>${esc(p.name)}</h3><div class="pack-offer"><p class="price">${esc(p.price)}</p>${PACKS_ON_SALE ? `<a class="btn" data-pack-buy href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>${PACKS_ON_SALE ? buyNote : ''}<p>${esc(p.blurb)}</p></div>`).join('')}</div>
+<p class="billing-note">${ONE_OFF}</p>
+<div class="grid packs">${packs.map((p) => `<div class="card pack reveal" id="pack-${esc(p.slug)}"><h3>${esc(p.name)}</h3><div class="pack-offer"><p class="price">${esc(p.price)}</p><p class="billing-note">${ONE_OFF}</p>${PACKS_ON_SALE ? `<a class="btn" data-pack-buy href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>${PACKS_ON_SALE ? buyNote : ''}<p>${esc(p.blurb)}</p></div>`).join('')}</div>
 ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
 <p class="muted">Packs are sold by ${COMPANY}. Payments are processed securely by Stripe. We never see your card details.</p></section>`,
 });
