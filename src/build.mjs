@@ -8,11 +8,11 @@ const PREVIEW = process.env.PREVIEW !== '0'; // default: preview mode = noindex 
 const OUT = new URL('../dist/', import.meta.url).pathname;
 const NAME = 'AIForThisJob';
 const SUPPORT = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
-// The company that runs the site and supplies the packs. Licence number as given on its Services Licence.
+// The company that runs the site and sells the packs. Licence number as given on its Services Licence.
 const COMPANY = 'Kaloozo FZ-LLC';
 const COMPANY_ADDRESS = 'Compass Building, Al Hulaila Industrial Zone-FZ, Ras Al Khaimah, United Arab Emirates';
 const COMPANY_LICENCE = '47037196';
-const LEGAL_UPDATED = '29 October 2026';
+const LEGAL_UPDATED = '30 October 2026';
 // Dates shown and sent to search engines come from content (added / optional updated), never the build date,
 // so a rebuild doesn't fake freshness (Google: dates and sitemap lastmod must reflect real changes).
 const OG_IMAGE = { url: '/og/default.png', width: 1200, height: 630, alt: 'AIForThisJob: the right AI for the job, and how to tell if it pays back' };
@@ -127,7 +127,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <div><h2 class="footer-h">Explore</h2>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
 <div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
 <div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
-</div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}, which also supplies our packs. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
+</div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}. Packs are sold by ${COMPANY}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 <script src="/site.js" defer></script>
 </body>
 </html>`;
@@ -406,8 +406,8 @@ page({
 });
 
 // ---------- Packs ----------
-const buyNote = `<p class="buy-note">By buying you agree to immediate access to this digital download and that you lose your 14-day right to cancel once the download starts. Payment is handled by Stripe. <a href="/terms#right-to-cancel">Terms</a></p>`;
-const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital downloads you get straight after payment. By buying you agree to immediate access and that you lose your 14-day right to cancel once the download starts (Consumer Contracts Regulations 2013). This doesn’t affect your rights if a pack is faulty or not what you ordered. Prices include any VAT due. Packs are supplied by ${COMPANY}; payment goes through Stripe’s Managed Payments service, where Link (part of Stripe) is the merchant of record and handles VAT. See our <a href="/terms#right-to-cancel">terms</a>.</p>`;
+const buyNote = `<p class="buy-note">By buying you agree to immediate access to this digital download and that you lose your 14-day right to cancel once the download starts. Packs are sold by ${COMPANY}. Payments are processed securely by Stripe. <a href="/terms#right-to-cancel">Terms</a></p>`;
+const waiver = `<p class="fine-print"><strong>Before you buy:</strong> packs are digital downloads you get straight after payment. By buying you agree to immediate access and that you lose your 14-day right to cancel once the download starts (Consumer Contracts Regulations 2013). This doesn’t affect your rights if a pack is faulty or not what you ordered. Packs are sold by ${COMPANY}. Prices are shown in pounds sterling (GBP). The price shown is the total payable, unless checkout states otherwise. Payments are processed securely by Stripe. See our <a href="/terms#right-to-cancel">terms</a>.</p>`;
 page({
   path: '/packs', title: PACKS_ON_SALE ? 'AI prompt and agent-config packs for your job' : 'Prompt and agent-config packs (coming soon)',
   description: 'Ready-to-use AI prompt and set-up packs for specific jobs: customer email replies, meeting admin and investment operations.',
@@ -417,19 +417,19 @@ page({
 <p class="lede">The free library shows you what’s possible. A pack gives you a ready-made kit for one job: a set of prompts plus the templates, set-up notes and checklists listed on each pack below. Only the Investment Ops pack includes an ROI business-case worksheet.</p>
 <div class="grid packs">${packs.map((p) => `<div class="card pack reveal"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>${buyNote}` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
 ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
-<p class="muted">Packs are supplied by ${COMPANY}. Payments are processed securely by Stripe. We never see your card details.</p></section>`,
+<p class="muted">Packs are sold by ${COMPANY}. Payments are processed securely by Stripe. We never see your card details.</p></section>`,
 });
 
 // ---------- Terms ----------
 page({
   path: '/terms', title: 'Terms of sale',
-  description: 'Terms of sale for AIForThisJob digital packs: who supplies them, how payment and VAT work, your cancellation rights and what to do if something’s wrong.',
+  description: 'Terms of sale for AIForThisJob digital packs: who sells them, how payment works, your cancellation rights and what to do if something’s wrong.',
   body: `<section class="wrap narrow section prose"><h1>Terms of sale</h1>
 <p class="muted">Last updated ${LEGAL_UPDATED}.</p>
-<h2>Who we are</h2><p>${NAME} is run by ${COMPANY}, ${COMPANY_ADDRESS} (Services Licence number ${COMPANY_LICENCE}). ${COMPANY} supplies the packs sold on this site. In these terms, “we” and “us” mean ${COMPANY}. Contact: ${SUPPORT}.</p>
+<h2>Who we are</h2><p>${NAME} is run by ${COMPANY}, ${COMPANY_ADDRESS} (Services Licence number ${COMPANY_LICENCE}). Packs are sold by ${COMPANY}. In these terms, “we” and “us” mean ${COMPANY}. Contact: ${SUPPORT}.</p>
 <h2>Your legal rights</h2><p>If you buy as a consumer, nothing in these terms takes away or limits your legal rights. If you live in the UK, that includes your rights under the Consumer Rights Act 2015 and the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013.</p>
 <h2>What you’re buying</h2><p>Packs are digital content (documents and files) for your own use within your organisation. Please don’t resell or republish them.</p>
-<h2>Price and payment</h2><p>Prices are shown in pounds sterling and include any VAT due. Checkout and payment are handled by Stripe through its Managed Payments service. For the payment, Link (part of Stripe) acts as the merchant of record: it works out, collects and pays any VAT due, and sends your receipt. Your checkout and receipt may say the purchase was “sold through Link”, and your bank statement may show “LINK.COM*”. You can also contact Link support about payment questions. ${COMPANY} remains responsible for the packs themselves and for delivering them to you.</p>
+<h2>Price and payment</h2><p>Prices are shown in pounds sterling (GBP). The price shown is the total payable, unless checkout states otherwise. Packs are sold by ${COMPANY}. Payments are processed securely by Stripe.</p>
 <h2 id="right-to-cancel">Digital downloads and your right to cancel</h2><p>Under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013 you normally have 14 days to cancel an online purchase. Packs are digital downloads that you can access straight after payment. By buying a pack you agree to get immediate access to it, and you accept that you lose your 14-day right to cancel once the download starts. We say this next to every Buy button and repeat it in your delivery email.</p>
 <p>This doesn’t affect your other rights. If a file is faulty, won’t open, or isn’t the pack you ordered, email ${SUPPORT} and we’ll fix it, send the right file or refund you.</p>
 <h2>If something’s wrong</h2><p>Under the Consumer Rights Act 2015, digital content must be of satisfactory quality, fit for purpose and as described. If a pack isn’t, email ${SUPPORT} and we’ll fix it, replace it or refund you.</p>
@@ -481,10 +481,10 @@ page({
   description: 'How AIForThisJob uses personal data: newsletter sign-ups, pack purchases, support emails and hosting logs, who helps us, and your rights under UK GDPR.',
   body: `<section class="wrap narrow section prose"><h1>Privacy notice</h1>
 <p class="muted">Last updated ${LEGAL_UPDATED}.</p>
-<h2>Who we are</h2><p>${NAME} is run by ${COMPANY}, ${COMPANY_ADDRESS}. We are the controller of the personal data described here, which means we decide how it’s used. For anything about your data, email ${SUPPORT}.</p>
+<h2>Who we are</h2><p>${NAME} is run by ${COMPANY}, ${COMPANY_ADDRESS}. Packs are sold by ${COMPANY}. We are the controller of the personal data described here, which means we decide how it’s used. For anything about your data, email ${SUPPORT}.</p>
 <h2>What we collect and why</h2>
 <ul><li><strong>Newsletter.</strong> If you enter your email address, we send you one email asking you to confirm. We don’t store your address until you click the link in it, and the link stops working after 48 hours. Once you confirm, we keep your address on our mailing list with our email provider, Resend, and use it only to send the newsletter. Every newsletter has a one-click unsubscribe link. <em>Lawful basis: your consent, which you can withdraw at any time by unsubscribing.</em></li>
-<li><strong>Buying a pack.</strong> Stripe handles checkout and your card details; we never see them. Stripe shares the order details with us, such as your name, email address, country and what you bought. We use your email address to send your download link and your order details to help with support and to keep the business and tax records the law requires. <em>Lawful basis: to deliver what you bought (contract), and to meet our legal obligations for records.</em></li>
+<li><strong>Buying a pack.</strong> Packs are sold by ${COMPANY}. Stripe processes the payment for us and handles your card details; we never see them. Stripe shares the order details with us, such as your name, email address, country and what you bought. We use your email address to send your download link and your order details to help with support and to keep the business and tax records the law requires. <em>Lawful basis: to deliver what you bought (contract), and to meet our legal obligations for records.</em></li>
 <li><strong>Emails to support.</strong> If you email ${SUPPORT_EMAIL}, we receive your email address and whatever you write, and use them to reply and keep a record of what we agreed. <em>Lawful basis: our legitimate interest in answering you, or to deliver what you bought if it’s about an order.</em></li>
 <li><strong>Hosting logs.</strong> Like any website, our host records technical data such as IP addresses, browser type and the pages requested, to deliver the site and keep it secure. <em>Lawful basis: our legitimate interest in running a secure website.</em></li>
 <li><strong>ROI calculator.</strong> It runs entirely in your browser. Nothing you enter is sent to us.</li>
@@ -492,7 +492,7 @@ page({
 <p>We don’t sell your data, and we don’t use it for automated decisions about you.</p>
 <h2>Who helps us</h2>
 <p>We use these service providers, who process data for the purposes above:</p>
-<ul><li><strong>Stripe</strong> for checkout and payments. Through Managed Payments, Link (part of Stripe) is the merchant of record for your payment, so Stripe also uses your payment details under <a href="https://stripe.com/privacy" rel="noopener">its own privacy policy</a>.</li>
+<ul><li><strong>Stripe</strong> as payment processor for ${COMPANY}, to take checkout payments. Stripe is not the seller of the packs. It uses your payment details under <a href="https://stripe.com/privacy" rel="noopener">its own privacy policy</a>.</li>
 <li><strong>Resend</strong> to send the newsletter, confirmation emails and download emails, and to hold the mailing list.</li>
 <li><strong>Vercel</strong> to host the website and store the pack files.</li>
 <li><strong>ImprovMX</strong> to forward emails sent to ${SUPPORT_EMAIL} to our mailbox.</li></ul>
