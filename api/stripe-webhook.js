@@ -1,8 +1,10 @@
 // POST /api/stripe-webhook  <- Stripe (checkout.session.completed from Payment Links).
 // Verifies the signature on the raw body, works out which pack was bought, and emails the buyer a signed download link.
 // Idempotent: the Resend Idempotency-Key is the Checkout Session id, so Stripe retries never send twice.
-// 2xx for events we ignore; 5xx only for genuine failures so Stripe retries. Never logs emails or payloads.
-import { packForStripeIds } from '../lib/packs.mjs';
+// The Stripe account is shared with unrelated payments. Those are acknowledged with 200 {ignored:true}
+// (no email, one short log line). 5xx only for genuine failures of our own packs, so Stripe retries those.
+// Never logs emails or payloads.
+import { packForStripeIds, packs } from '../lib/packs.mjs';
 import { DOWNLOAD_TTL_S, deliveryEmail, makeDownloadToken, readRawBody, verifyStripeSignature } from '../lib/delivery.mjs';
 
 export const config = { api: { bodyParser: false } }; // we need the exact raw bytes for the signature check
@@ -12,6 +14,16 @@ const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/;
 
 const configured = () => Boolean(process.env.STRIPE_WEBHOOK_SECRET && process.env.RESEND_API_KEY && process.env.DOWNLOAD_SECRET
   && (process.env.PACK_FROM || process.env.NEWSLETTER_FROM));
+
+// Every pack has at least one Stripe id configured. An empty PACK_STRIPE_IDS_* is a config miss, not "someone else's payment".
+const packIdsConfigured = () => packs.every((p) => String(process.env[p.idsEnv] || '').split(',').some((s) => s.trim()));
+
+const OUR_SITE = 'aiforthisjob';
+
+function ignored(res, eventId, reason) {
+  console.log('stripe-webhook: ignored', reason, eventId);
+  return res.status(200).json({ ignored: true });
+}
 
 async function lineItemIds(sessionId) {
   if (!process.env.STRIPE_SECRET_KEY) return null;
@@ -40,6 +52,11 @@ export default async function handler(req, res) {
   if (session.object !== 'checkout.session' || !session.id) return res.status(200).json({ received: true, ignored: 'not_session' });
   if (session.payment_status !== 'paid') return res.status(200).json({ received: true, ignored: 'unpaid' });
 
+  // Not our sale on the shared account. Checked only after the signature, so a forged body cannot be ack'd.
+  const metaSite = typeof session.metadata?.site === 'string' ? session.metadata.site.trim() : '';
+  if (metaSite && metaSite !== OUR_SITE) return ignored(res, event.id, 'other_site');
+  if (session.payment_link == null || session.payment_link === '') return ignored(res, event.id, 'no_payment_link');
+
   // Which pack? Payment Link id first (in the event, no API call), then the session's line items (price / product ids).
   let pack = packForStripeIds([session.payment_link]);
   if (!pack) {
@@ -48,7 +65,13 @@ export default async function handler(req, res) {
       if (ids) pack = packForStripeIds(ids);
     } catch (e) { console.error('stripe-webhook: line item lookup failed', event.id, e.message); return res.status(502).json({ error: 'stripe_lookup_failed' }); }
   }
-  if (!pack) { console.error('stripe-webhook: paid session matches no pack (check PACK_STRIPE_IDS_*)', event.id); return res.status(500).json({ error: 'unknown_pack' }); }
+  if (!pack) {
+    // Ids are set and neither the Payment Link nor the line items are one of our packs: another payment on the account.
+    // An empty PACK_STRIPE_IDS_* still 500s, so Stripe retries our own sale after the variable is filled in.
+    if (packIdsConfigured()) return ignored(res, event.id, 'not_our_pack');
+    console.error('stripe-webhook: paid session matches no pack (check PACK_STRIPE_IDS_*)', event.id);
+    return res.status(500).json({ error: 'unknown_pack' });
+  }
 
   const email = String(session.customer_details?.email || session.customer_email || '').trim();
   if (!EMAIL_RE.test(email)) { console.error('stripe-webhook: paid session has no usable email', event.id); return res.status(500).json({ error: 'no_email' }); }

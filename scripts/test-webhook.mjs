@@ -22,11 +22,14 @@ globalThis.fetch = async (url, opts = {}) => {
   if (url.startsWith('https://api.resend.com/emails')) {
     const key = opts.headers['Idempotency-Key'];
     calls.resend.push({ key, body: JSON.parse(opts.body) });
+    if (key === 'pack-delivery/cs_test_sendfail') return json(500, { name: 'api_error' });
     if (sentKeys.has(key)) return json(200, { id: 'email_1' }); // Resend returns the original response for a repeated key
     sentKeys.add(key); calls.sent = (calls.sent || 0) + 1; return json(200, { id: 'email_1' });
   }
   if (url.startsWith('https://api.stripe.com/v1/checkout/sessions/')) {
-    calls.stripe.push(url); return json(200, { data: [{ price: { id: 'price_INVOPS', product: 'prod_INVOPS' } }] });
+    calls.stripe.push(url);
+    const foreign = url.includes('/cs_test_foreign');
+    return json(200, { data: [{ price: { id: foreign ? 'price_OTHER' : 'price_INVOPS', product: foreign ? 'prod_OTHER' : 'prod_INVOPS' } }] });
   }
   if (url.startsWith(env.PACK_FILE_BASE_URL)) {
     calls.blob.push({ url, auth: opts.headers.Authorization }); return new Response('PK-zip-bytes', { status: 200, headers: { 'Content-Length': '12' } });
@@ -90,6 +93,95 @@ let n = 0; const ok = (name) => console.log(`ok ${++n} - ${name}`);
   const saved = process.env.PACK_STRIPE_IDS_INVOPS; process.env.PACK_STRIPE_IDS_INVOPS = '';
   const b = event({ id: 'cs_test_none', payment_link: 'plink_unknown' }); const r = await post(b, sign(b));
   process.env.PACK_STRIPE_IDS_INVOPS = saved; assert.equal(r.statusCode, 500); ok('paid but unmapped -> 5xx so Stripe retries after config fix');
+}
+async function withLogs(fn) {
+  const logged = []; const errors = [];
+  const log = console.log; const err = console.error;
+  console.log = (...a) => { logged.push(a.map(String).join(' ')); };
+  console.error = (...a) => { errors.push(a.map(String).join(' ')); };
+  try { return { result: await fn(), logged, errors }; }
+  finally { console.log = log; console.error = err; }
+}
+const quiet = (line) => !line.includes('@') && !line.includes('buyer') && !line.includes('payload') && !line.includes('plink_') && !line.includes('price_');
+{
+  const before = { resend: calls.resend.length, stripe: calls.stripe.length, sent: calls.sent };
+  const b = event({ id: 'cs_test_foreign', payment_link: 'plink_OTHER' });
+  const { result, logged, errors } = await withLogs(() => post(b, sign(b)));
+  assert.equal(result.statusCode, 200); assert.deepEqual(result.body, { ignored: true });
+  assert.equal(calls.resend.length, before.resend); assert.equal(calls.sent, before.sent); assert.equal(calls.stripe.length, before.stripe + 1);
+  assert.deepEqual(logged, ['stripe-webhook: ignored not_our_pack evt_1']); assert.deepEqual(errors, []);
+  assert.ok(logged.every(quiet)); ok('foreign payment link and price -> 200 ignored, no email, short log');
+}
+{
+  const before = { resend: calls.resend.length, stripe: calls.stripe.length };
+  const b = event({ id: 'cs_test_foreign_async', payment_link: 'plink_OTHER' }, 'checkout.session.async_payment_succeeded');
+  const { result, logged, errors } = await withLogs(() => post(b, sign(b)));
+  assert.equal(result.statusCode, 200); assert.deepEqual(result.body, { ignored: true });
+  assert.equal(calls.resend.length, before.resend); assert.equal(calls.stripe.length, before.stripe + 1);
+  assert.deepEqual(logged, ['stripe-webhook: ignored not_our_pack evt_1']); assert.deepEqual(errors, []);
+  ok('async_payment_succeeded for another payment link -> 200 ignored');
+}
+{
+  const before = { resend: calls.resend.length, stripe: calls.stripe.length };
+  const b = event({ id: 'cs_test_nolink', payment_link: null });
+  const { result, logged, errors } = await withLogs(() => post(b, sign(b)));
+  assert.equal(result.statusCode, 200); assert.deepEqual(result.body, { ignored: true });
+  assert.equal(calls.resend.length, before.resend); assert.equal(calls.stripe.length, before.stripe);
+  assert.deepEqual(logged, ['stripe-webhook: ignored no_payment_link evt_1']); assert.deepEqual(errors, []);
+  assert.ok(logged.every(quiet)); ok('no payment link -> 200 ignored, no lookup, no email');
+}
+{
+  const before = { resend: calls.resend.length, stripe: calls.stripe.length };
+  const b = event({ id: 'cs_test_nolink2', payment_link: '' });
+  const { result, logged } = await withLogs(() => post(b, sign(b)));
+  assert.equal(result.statusCode, 200); assert.deepEqual(result.body, { ignored: true });
+  assert.equal(calls.resend.length, before.resend); assert.equal(calls.stripe.length, before.stripe);
+  assert.deepEqual(logged, ['stripe-webhook: ignored no_payment_link evt_1']);
+  ok('blank payment link -> 200 ignored');
+}
+{
+  const before = { resend: calls.resend.length, stripe: calls.stripe.length };
+  const b = event({ id: 'cs_test_othersite', payment_link: 'plink_EMAIL', metadata: { site: 'other-shop' } });
+  const { result, logged, errors } = await withLogs(() => post(b, sign(b)));
+  assert.equal(result.statusCode, 200); assert.deepEqual(result.body, { ignored: true });
+  assert.equal(calls.resend.length, before.resend); assert.equal(calls.stripe.length, before.stripe);
+  assert.deepEqual(logged, ['stripe-webhook: ignored other_site evt_1']); assert.deepEqual(errors, []);
+  assert.ok(logged.every(quiet)); assert.ok(!logged.join('\n').includes('other-shop'));
+  ok('metadata.site other than aiforthisjob -> 200 ignored, even if the payment link is ours');
+}
+{
+  const b = event({ id: 'cs_test_tagged', metadata: { site: 'aiforthisjob' } });
+  const r = await post(b, sign(b));
+  assert.equal(r.statusCode, 200); assert.equal(r.body.delivered, 'email-replies');
+  ok('metadata.site aiforthisjob still delivers our pack');
+}
+{
+  const b = event({ id: 'cs_test_emptymeta', metadata: { site: '  ' } });
+  const r = await post(b, sign(b));
+  assert.equal(r.statusCode, 200); assert.equal(r.body.delivered, 'email-replies');
+  ok('blank metadata.site is not treated as another site');
+}
+{
+  const b = event({ id: 'cs_test_badsig', payment_link: null, metadata: { site: 'other-shop' } });
+  const { result, logged } = await withLogs(() => post(b, sign(b, now, 'whsec_wrong')));
+  assert.equal(result.statusCode, 400); assert.equal(result.body.error, 'bad_signature');
+  assert.deepEqual(logged, []); ok('bad signature is rejected before ignore rules');
+}
+{
+  const saved = process.env.RESEND_API_KEY; delete process.env.RESEND_API_KEY;
+  const b = event({ id: 'cs_test_noconfig', payment_link: 'plink_OTHER', metadata: { site: 'other-shop' } });
+  const { result, errors } = await withLogs(() => post(b, sign(b)));
+  process.env.RESEND_API_KEY = saved;
+  assert.equal(result.statusCode, 503); assert.equal(result.body.error, 'not_configured');
+  assert.ok(errors.some((line) => line.includes('not configured') && !line.includes('@')));
+  ok('missing config stays 503 for an unrelated event');
+}
+{
+  const b = event({ id: 'cs_test_sendfail' });
+  const { result, errors } = await withLogs(() => post(b, sign(b)));
+  assert.equal(result.statusCode, 502); assert.equal(result.body.error, 'send_failed');
+  assert.ok(errors.some((line) => line.includes('resend send failed') && !line.includes('@')));
+  ok('resend failure on our pack stays 502 so Stripe retries');
 }
 { const res = mockRes(); await webhook({ method: 'GET', headers: {} }, res); assert.equal(res.statusCode, 405); ok('GET -> 405'); }
 
