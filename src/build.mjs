@@ -4,7 +4,13 @@ import { categories, useCases, guides, sources, sections } from './data.mjs';
 import { packs as catalogue, SUPPORT_EMAIL } from '../lib/packs.mjs';
 
 const SITE = (process.env.SITE_URL || 'https://www.aiforthisjob.com').replace(/\/$/, ''); // canonical host (apex 308-redirects to www)
-const PREVIEW = process.env.PREVIEW !== '0'; // default: preview mode = noindex until Greg approves launch
+// On Vercel, launch mode is only Production. VERCEL_ENV is set by the platform
+// (production, preview, or development), so this does not depend on a dashboard env var,
+// and a dashboard PREVIEW value cannot make a branch preview indexable or hold Production back.
+// Locally there is no VERCEL_ENV: `npm run build` stays noindex, `npm run build:launch` sets PREVIEW=0.
+const PREVIEW = process.env.VERCEL_ENV
+  ? process.env.VERCEL_ENV !== 'production'
+  : process.env.PREVIEW !== '0';
 const OUT = new URL('../dist/', import.meta.url).pathname;
 const NAME = 'AIForThisJob';
 const SUPPORT = `<a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a>`;
@@ -603,4 +609,4 @@ const assets = ['styles.css', 'site.js', 'favicon.svg', 'logo.png', 'apple-touch
 mkdirSync(join(OUT, 'og'), { recursive: true });
 for (const f of assets) copyFileSync(new URL(`./static/${f}`, import.meta.url), join(OUT, f));
 files.push(...assets);
-console.log(`Built ${files.length} files to dist/ (SITE=${SITE}, PREVIEW=${PREVIEW})`);
+console.log(`Built ${files.length} files to dist/ (SITE=${SITE}, PREVIEW=${PREVIEW}, MODE=${PREVIEW ? 'PREVIEW' : 'LAUNCH'})`);
