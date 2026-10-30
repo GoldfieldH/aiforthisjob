@@ -119,7 +119,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <header class="site-header"><div class="wrap nav">
 <a class="logo" href="/" aria-label="${NAME} home"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a>
 <nav class="nav-links" aria-label="Main">${navLinks.map(([h, t]) => `<a href="${h}"${isCurrent(h) ? ' aria-current="page"' : ''}>${esc(t)}</a>`).join('')}</nav>
-<a class="btn btn-sm nav-cta" href="/newsletter">Newsletter</a>
+<div class="nav-tools"><a class="btn btn-sm nav-buy" href="/packs"${isCurrent('/packs') ? ' aria-current="page"' : ''}>Buy</a><a class="btn btn-sm nav-cta" href="/newsletter">Newsletter</a></div>
 </div>${progress ? '<div class="progress" aria-hidden="true"><span></span></div>' : ''}</header>
 <main id="main">${body}</main>
 <footer class="site-footer"><div class="wrap footer-grid">
@@ -128,6 +128,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
 <div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}. Packs are sold by ${COMPANY}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
+${path === '/packs' ? '' : '<a class="btn buy-fab" href="/packs">Buy packs</a>'}
 <script src="/site.js" defer></script>
 </body>
 </html>`;
@@ -415,7 +416,7 @@ page({
   jsonld: [crumbsLd([['Home', '/'], ['Packs', '/packs']]), ...(PACKS_ON_SALE ? packs.map((p) => ({ '@context': 'https://schema.org', '@type': 'Product', name: p.name, description: p.blurb, image: SITE + OG_IMAGE.url, brand: { '@type': 'Brand', name: NAME }, category: 'Digital download', offers: { '@type': 'Offer', url: `${SITE}/packs`, price: p.price.replace(/[^0-9.]/g, ''), priceCurrency: 'GBP', availability: 'https://schema.org/InStock', itemCondition: 'https://schema.org/NewCondition' } })) : [])],
   body: `<section class="wrap narrow section">${PACKS_ON_SALE ? '' : '<span class="tag">Coming soon</span>'}<h1 class="display-s">Prompt and agent-config packs</h1>
 <p class="lede">The free library shows you what’s possible. A pack gives you a ready-made kit for one job: a set of prompts plus the templates, set-up notes and checklists listed on each pack below. Only the Investment Ops pack includes an ROI business-case worksheet.</p>
-<div class="grid packs">${packs.map((p) => `<div class="card pack reveal"><h3>${esc(p.name)}</h3><p class="price">${esc(p.price)}</p><p>${esc(p.blurb)}</p>${PACKS_ON_SALE ? `<a class="btn" href="${esc(p.url)}" rel="noopener">Buy now</a>${buyNote}` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>`).join('')}</div>
+<div class="grid packs">${packs.map((p) => `<div class="card pack reveal" id="pack-${esc(p.slug)}"><h3>${esc(p.name)}</h3><div class="pack-offer"><p class="price">${esc(p.price)}</p>${PACKS_ON_SALE ? `<a class="btn" data-pack-buy href="${esc(p.url)}" rel="noopener">Buy now</a>` : '<span class="btn btn-disabled" aria-disabled="true">Coming soon</span>'}</div>${PACKS_ON_SALE ? buyNote : ''}<p>${esc(p.blurb)}</p></div>`).join('')}</div>
 ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet. Want first access? <a href="/newsletter">Join the waiting list</a>.</p>'}
 <p class="muted">Packs are sold by ${COMPANY}. Payments are processed securely by Stripe. We never see your card details.</p></section>`,
 });
