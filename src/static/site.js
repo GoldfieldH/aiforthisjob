@@ -109,3 +109,34 @@ if (roi) {
   const openPrompt = () => { if (location.hash === '#prompt') { const d = document.querySelector('.prompt-details'); if (d) d.open = true; } };
   addEventListener('hashchange', openPrompt); openPrompt();
 })();
+
+// Buy packs pill: hide it once a pack Buy button is actually on screen.
+// The pill is in the HTML, so it stays visible with no JS and in browsers without IntersectionObserver.
+(() => {
+  const fab = document.querySelector('.buy-fab');
+  if (!fab || !('IntersectionObserver' in window)) return;
+  const buys = [...document.querySelectorAll('[data-pack-buy]')];
+  if (!buys.length) return;
+  const onScreen = new Set();
+  const apply = () => {
+    const hide = onScreen.size > 0;
+    fab.classList.toggle('is-hidden', hide);
+    if (hide) {
+      if (document.activeElement === fab) fab.blur();
+      fab.setAttribute('aria-hidden', 'true');
+      fab.setAttribute('tabindex', '-1');
+    } else { fab.removeAttribute('aria-hidden'); fab.removeAttribute('tabindex'); }
+  };
+  const headerH = () => { const h = document.querySelector('.site-header'); return h ? Math.round(h.getBoundingClientRect().height) : 0; };
+  const seen = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0 && r.bottom > headerH() + 4 && r.top < innerHeight - 4;
+  };
+  if (buys.some(seen)) { buys.filter(seen).forEach((el) => onScreen.add(el)); apply(); }
+  // Same box as seen(): ignore the strip hidden under the sticky header.
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) { if (e.isIntersecting && seen(e.target)) onScreen.add(e.target); else onScreen.delete(e.target); }
+    apply();
+  }, { rootMargin: `-${headerH()}px 0px 0px 0px`, threshold: 0 });
+  buys.forEach((el) => io.observe(el));
+})();
