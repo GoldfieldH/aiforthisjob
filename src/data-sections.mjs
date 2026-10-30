@@ -8,6 +8,7 @@ export const newSources = {
   nistRmf: { title: 'NIST, AI Risk Management Framework', url: 'https://www.nist.gov/itl/ai-risk-management-framework', kind: 'Standards body' },
   govAIPlaybook: { title: 'GOV.UK, "AI Playbook for the UK Government" (February 2025)', url: 'https://www.gov.uk/government/publications/ai-playbook-for-the-uk-government', kind: 'Government guidance' },
   govTrading: { title: 'GOV.UK (HMRC), "Tax-free allowances on property and trading income"', url: 'https://www.gov.uk/guidance/tax-free-allowances-on-property-and-trading-income', kind: 'Government guidance' },
+  govTradingIncrease: { title: 'GOV.UK (HMRC), "Income Tax: increasing the trading allowance" (28 October 2026)', url: 'https://www.gov.uk/government/publications/income-tax-increasing-the-trading-allowance', kind: 'Government guidance' },
   govSelfEmployed: { title: 'GOV.UK, "Working for yourself"', url: 'https://www.gov.uk/working-for-yourself', kind: 'Government guidance' },
   asaMoney: { title: 'ASA/CAP, "Money making courses: stick to the facts" (April 2026)', url: 'https://www.asa.org.uk/news/money-making-courses-stick-to-the-facts.html', kind: 'Regulator guidance' },
   kdp: { title: 'Amazon KDP, Content guidelines (AI content section)', url: 'https://kdp.amazon.com/en_US/help/topic/G200672390', kind: 'Platform policy' },
@@ -51,7 +52,7 @@ export const sections = [
   {
     slug: 'make-money-with-ai', name: 'Make money with AI', short: 'Make money',
     eyebrow: 'Side income and small business',
-    headline: 'Earn with AI. Honestly.',
+    headline: 'Side income with AI: the honest version.',
     intro: 'Practical side-income and small-business ideas where AI does the heavy lifting and you supply the skill. Each one spells out the real effort, what it costs to start and the rules you need to follow.',
     disclaimer: 'We don’t promise or imply any level of earnings. Any of these ideas can earn nothing at all, and some cost money to start. What you make, if anything, depends on your skills, time, prices, market and luck. We don’t publish income figures because we can’t back them up. This is general information, not financial, tax or legal advice. If you start selling, check GOV.UK on whether you need to tell HMRC.',
   },
@@ -72,7 +73,7 @@ export const sections = [
 export const newUseCases = [
   // ---------------- Make money with AI ----------------
   {
-    slug: 'offer-ai-setup-help-to-local-businesses', cat: 'side-income', section: 'make-money-with-ai', added: T_NEW,
+    slug: 'offer-ai-setup-help-to-local-businesses', cat: 'side-income', section: 'make-money-with-ai', added: T_NEW, updated: '2026-10-29T21:45:00Z',
     title: 'Offer AI set-up help to local businesses',
     summary: 'If you’ve learned to use AI tools well, small businesses near you may pay for someone to set up simple, safe workflows they can run themselves.',
     job: 'Plenty of small firms have been told to “use AI” but haven’t got the time to work out where to start. If you have, that know-how can be a service.',
@@ -96,7 +97,7 @@ export const newUseCases = [
       'Whether clients are still using the set-up a month later (a sign it was worth paying for).',
       'Referrals and repeat work, rather than one-off favours.',
     ],
-    evidence: 'We don’t publish income figures: what anyone earns depends on their skills, prices, location and time. GOV.UK says you’re likely to be trading if, for example, you’re paid for a service you provide, and HMRC’s trading allowance means gross trading income of £1,000 or less in a tax year may not need to be reported, though there are exceptions. Above that, you must register for Self Assessment.',
+    evidence: 'We don’t publish income figures: what anyone earns depends on their skills, prices, location and time. GOV.UK says you’re likely to be trading if, for example, you’re paid for a service you provide, and HMRC’s trading allowance means gross trading income of £1,000 or less in a tax year may not need to be reported, though there are exceptions. Above that, you must register for Self Assessment. The government has announced that the allowance and this reporting threshold will rise to £3,000 from 6 April 2027 (the 2027 to 2028 tax year).',
     prompt: `You are helping me prepare a small AI set-up service for a local business.
 Business type: [e.g. dog groomer, accountant, café]
 What they told me about their week: """[paste your notes from the conversation]"""
@@ -106,7 +107,7 @@ My skills and tools: [e.g. ChatGPT, Zapier, Google Workspace]
 2. For the single best task, write a one-page proposal in plain British English: the problem, what I'll set up, what is NOT included, what the client must provide, how a person stays in control of anything sent or paid, and how we'll check it's working after 30 days.
 3. List questions I still need to ask the client.
 Do not invent figures for time saved or money earned. Mark anything that needs the client's numbers as [CLIENT TO CONFIRM].`,
-    sources: ['govSelfEmployed', 'govTrading', 'icoAI', 'zapier'],
+    sources: ['govSelfEmployed', 'govTrading', 'govTradingIncrease', 'icoAI', 'zapier'],
   },
   {
     slug: 'sell-templates-from-your-expertise', cat: 'side-income', section: 'make-money-with-ai', added: T_NEW,
