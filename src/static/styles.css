@@ -197,12 +197,11 @@ a.tag:hover{filter:brightness(1.1)}
 /* Welcome clip on /start. Flat, same column as the article. No card, no shadow. */
 .welcome{margin:0 0 28px}
 .welcome h2{margin-top:1.25em}
-.welcome h3{margin-top:1.5em}
 .welcome-player{margin:16px 0 0}
 .welcome-player video{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:16/9;background:#fbfbfd;border:1px solid var(--line);border-radius:var(--radius-s)}
 .welcome-player figcaption{margin-top:12px;max-width:66ch}
 .welcome-player figcaption .muted{display:block;margin-top:4px}
-.welcome ul{margin:12px 0 0;padding-left:1.2em}
+.welcome ul{margin:20px 0 0;padding-left:1.2em}
 .welcome li{margin:.4em 0;max-width:66ch}
 
 /* Article */

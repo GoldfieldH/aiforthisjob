@@ -429,7 +429,6 @@ page({
 </video>
 <figcaption>Asking questions is a start. This clip shows how to hand a tool a real job, safely, whatever work you do. <span class="muted">Original background music made for this site.</span></figcaption>
 </figure>
-<h3>The same welcome, if you’d rather read</h3>
 <ul>
 <li>You’ve got the tools. Maybe someone at work said “find a way to use this”, or you downloaded an app and stared at the empty box.</li>
 <li>Most people stop at asking questions. That’s fine, but it’s the smallest thing these tools can do. Hand it a job instead. Say you’re a fitness coach. Tell it about your client: forty-two, a sore knee, three sessions a week, and a goal to run ten kilometres in twelve weeks. Ask for the twelve-week plan, a short check-in for each week, and easy swaps if the knee flares up. You get a first draft in a couple of minutes. You still check it. You’re the coach.</li>
