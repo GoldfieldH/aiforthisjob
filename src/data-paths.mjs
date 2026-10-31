@@ -247,10 +247,16 @@ For each meal: a name, the ingredients from my list it uses, and the steps in sh
 Then list a few cheap staples that would make another meal possible, marked as "I may not have these".
 Do not set calorie targets. Do not tell me to cut out a food group.
 If my list is too thin to make four meals, say so and suggest fewer.`,
+    tipTitle: 'A tip from Greg',
+    tip: 'Instead of typing the ingredients, take out the things worth using, lay them on the kitchen counter, and take one photo. Packets of rice or tins can go in the photo too. Upload it and ask for meals. It sometimes confuses lookalikes, for example a courgette and a cucumber, so check the list it reads out before you cook.',
+    photoPrompt: `Here is a photo of what I have to cook with. List what you can see, tell me if you're unsure about anything, then suggest three simple meals.
+
+This is not medical or diet advice. Do not set calorie targets or tell me to cut out a food group.`,
     good: [
       'The meals use food you named, not a surprise shopping list dressed up as a plan.',
       'Missing items are labelled as missing.',
       'You could start cooking the first one without another search.',
+      'If you used a photo, the list it reads out matches what was on the counter.',
     ],
     sources: ['nhsEatwell', 'openaiPrompt'],
   },
@@ -482,7 +488,7 @@ export const goals = [
     title: 'Plan meals or a trip',
     card: 'A first prompt that asks whether you are planning food or a trip, then points you at a planner that will not invent prices.',
     lede: 'Say which one you mean. Meals should come from food you have. A trip outline should leave prices and opening times blank until you check them.',
-    thought: 'Pick one. If you paste both a fridge list and a holiday, you will get a muddle. Tell it your limits (time, budget, people, foods you avoid) and expect questions back if you were vague. That is a good result.',
+    thought: 'Pick one. If you paste both a fridge list and a holiday, you will get a muddle. Tell it your limits (time, budget, people, foods you avoid) and expect questions back if you were vague. That is a good result. For meals, you can take one photo of the food on the counter. The fridge page has that prompt, and a reminder to check the list before you cook.',
     prompt: `I want help planning. First say whether I have given you enough to plan meals or a trip. If not, ask me at most five questions and then stop.
 
 Which one: [MEALS or a TRIP]
@@ -499,6 +505,7 @@ End with what I should confirm myself.`,
       'You are not given a fake price or a medical diet.',
     ],
     next: [
+      { href: '/little-things#photo-meals-from-the-fridge', label: 'Photo version: one picture of the counter' },
       { href: '/little-things#thing-meals-from-the-fridge', label: 'Meals from what is in the fridge' },
       { href: '/little-things#thing-simple-trip', label: 'A trip outline with the prices left blank' },
     ],

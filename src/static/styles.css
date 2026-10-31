@@ -134,8 +134,8 @@ html:has(.buy-fab){scroll-padding-bottom:calc(92px + env(safe-area-inset-bottom,
 .inline-links,.next-list,.jump{padding-left:1.2em}
 .inline-links li,.next-list li,.jump li{margin:.35em 0}
 .jump{columns:2;margin:0 0 28px}
-.stack{display:grid;gap:22px}
-.thing{scroll-margin-top:calc(var(--nav-h) + 18px);background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:36px 0 8px;box-shadow:none}
+.stack{display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+.thing{min-width:0;scroll-margin-top:calc(var(--nav-h) + 18px);background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:36px 0 8px;box-shadow:none}
 .thing h2{margin-top:12px}
 .want-more h2{margin-top:0}
 .trust{display:flex;gap:10px 26px;justify-content:center;flex-wrap:wrap;list-style:none;padding:0;margin:0;color:var(--muted);font-size:.92rem}
@@ -225,8 +225,9 @@ th{background:var(--bg-soft);font-weight:600}tr:last-child td{border-bottom:0}
 .checklist li:before{content:"";position:absolute;left:0;top:.28em;width:18px;height:18px;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--muted)}
 
 /* Prompt block */
-.prompt-block{margin:2.4em 0;padding:26px;border-radius:var(--radius);background:var(--bg-soft);border:1px solid var(--line)}
+.prompt-block{min-width:0;margin:2.4em 0;padding:26px;border-radius:var(--radius);background:var(--bg-soft);border:1px solid var(--line)}
 .prompt-block h2{margin-top:0}
+.prompt-details,.prompt-details summary{min-width:0}
 .prompt-details summary{display:flex;align-items:center;gap:14px;cursor:pointer;list-style:none}
 .prompt-details summary::-webkit-details-marker{display:none}
 .prompt-details summary .btn:after{content:"↓";margin-left:4px;transition:transform .3s var(--ease)}

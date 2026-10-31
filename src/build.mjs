@@ -171,13 +171,21 @@ const signup = (id = 'signup') => `<section class="signup band-dark" id="${id}" 
 const sourceList = (keys) => `<ol class="sources">${keys.map((k) => { const s = sources[k]; return `<li><a href="${s.url}" rel="noopener" target="_blank">${esc(s.title)}</a> <span class="kind">${esc(s.kind)}</span></li>`; }).join('')}</ol>`;
 
 const highlightSlots = (escaped) => escaped.replace(/\[([^\]\n]+)\]/g, '<mark class="slot">[$1]</mark>');
-const promptBlock = (text, label = 'Ready-to-use prompt', id = 'prompt') => `<section class="prompt-block reveal" id="${esc(id)}" aria-labelledby="${esc(id)}-h">
+const promptBlock = (text, label = 'Ready-to-use prompt', id = 'prompt', note) => {
+  const hasSlots = /\[[^\]\n]+\]/.test(text);
+  const helper = note != null
+    ? esc(note)
+    : (hasSlots
+      ? `Highlighted <mark class="slot">[brackets]</mark> are the parts you replace. Only paste information you’re allowed to share with the tool you’re using.`
+      : `Only paste information you’re allowed to share with the tool you’re using.`);
+  return `<section class="prompt-block reveal" id="${esc(id)}" aria-labelledby="${esc(id)}-h">
 <h2 id="${esc(id)}-h">${esc(label)}</h2>
-<p class="muted small">Highlighted <mark class="slot">[brackets]</mark> are the parts you replace. Only paste information you’re allowed to share with the tool you’re using.</p>
+<p class="muted small">${helper}</p>
 <details class="prompt-details" open>
 <summary><span class="btn btn-sm">The prompt</span><span class="peek">${esc(text.split('\n')[0])}</span></summary>
 <div class="prompt-wrap"><button class="copy btn btn-sm btn-ghost" type="button" data-label="Copy prompt">Copy prompt</button><pre class="prompt"><code>${highlightSlots(esc(text))}</code></pre></div>
 </details></section>`;
+};
 // Guide pages sometimes include a prompt in the body, not only in the prompt field.
 function decorateInlinePrompts(html) {
   return html.replace(/<pre class="prompt"><code>([\s\S]*?)<\/code><\/pre>/g, (_, raw) => `<p class="muted small">Highlighted <mark class="slot">[brackets]</mark> are the parts you replace. Only paste information you’re allowed to share.</p><div class="prompt-wrap"><button class="copy btn btn-sm btn-ghost" type="button" data-label="Copy prompt">Copy prompt</button><pre class="prompt"><code>${highlightSlots(esc(raw))}</code></pre></div>`);
@@ -502,6 +510,8 @@ page({
 <h2>${esc(t.title)}</h2>
 <h3>Why this works</h3>
 <p>${esc(t.why)}</p>
+${t.tip ? `<h3>${esc(t.tipTitle || 'A tip')}</h3><p>${esc(t.tip)}</p>` : ''}
+${t.photoPrompt ? promptBlock(t.photoPrompt, 'Copy this if you have a photo', `photo-${t.slug}`, 'Upload the photo in the chat, then paste this underneath. Only share a picture you’re happy for that tool to see.') : ''}
 ${promptBlock(t.prompt, 'Copy this prompt', `prompt-${t.slug}`)}
 <h3>What good looks like</h3>
 <ul>${t.good.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
