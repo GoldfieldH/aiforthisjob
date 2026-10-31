@@ -104,7 +104,7 @@ What they told me about their week: """[paste your notes from the conversation]"
 My skills and tools: [e.g. ChatGPT, Zapier, Google Workspace]
 
 1. List the three most repetitive tasks in my notes, and for each say whether a simple prompt, a fixed workflow or nothing at all is the best fit. Be honest if AI isn't worth it.
-2. For the single best task, write a one-page proposal in simple, everyday British English: the problem, what I'll set up, what is NOT included, what the client must provide, how a person stays in control of anything sent or paid, and how we'll check it's working after 30 days.
+2. For the single best task, write a one-page proposal in simple language an everyday person would understand: the problem, what I'll set up, what is NOT included, what the client must provide, how a person stays in control of anything sent or paid, and how we'll check it's working after 30 days.
 3. List questions I still need to ask the client.
 Do not invent figures for time saved or money earned. Mark anything that needs the client's numbers as [CLIENT TO CONFIRM].`,
     sources: ['govSelfEmployed', 'govTrading', 'govTradingIncrease', 'icoAI', 'zapier'],
@@ -136,12 +136,12 @@ Do not invent figures for time saved or money earned. Mark anything that needs t
     ],
     evidence: 'We don’t publish sales or income figures. Results vary widely, and many products sell few or no copies. The rules we cite (KDP’s AI disclosure, the ASA’s guidance on money-making claims and HMRC’s trading allowance) are from the official pages listed below.',
     prompt: `Act as an interviewer helping me turn my experience into a practical template pack.
-My field: [e.g. running a small nursery, managing a dental practice rota]
+My field: [e.g. running a small childcare service, managing a dental practice schedule]
 Who it's for: [e.g. new practice managers]
 
 Step 1: Ask me 10 questions, one at a time, that draw out what I know that a newcomer gets wrong. Wait for each answer.
 Step 2: When I've answered, propose a pack of 3 to 5 items (checklists, templates, a short guide) with a one-line purpose for each.
-Step 3: For the first item, draft it in simple, everyday British English, marking with [CHECK] anything I must verify and [MY EXAMPLE] where I should add a real example.
+Step 3: For the first item, draft it in simple language an everyday person would understand, marking with [CHECK] anything I must verify and [MY EXAMPLE] where I should add a real example.
 Step 4: Write an honest product description: who it's for, what's inside, what it won't do. No income, results or time-saving promises.`,
     sources: ['kdp', 'asaMoney', 'govTrading', 'govSelfEmployed'],
   },
@@ -178,7 +178,7 @@ Here is the material (the client has agreed I can use AI tools on it):
 1. Do a first pass that follows the brief exactly. Show each change as: original → suggestion → reason.
 2. List anything in the brief you couldn't follow, or anything ambiguous I should ask the client about.
 3. List any facts, names or numbers I must verify myself.
-Use British English. Don't add new claims or content the client didn't provide.`,
+Use simple language an everyday person would understand. Don't add new claims or content the client didn't provide.`,
     sources: ['govSelfEmployed', 'govTrading', 'icoAI'],
   },
   {
@@ -214,7 +214,7 @@ Act as a sceptical but fair adviser.
 2. For the riskiest one, design the cheapest test I could run in two weeks without building the product.
 3. Write 8 neutral customer interview questions about their current problem (not about my idea). No leading questions.
 4. Tell me what result would make you advise me to stop.
-Be direct. Use British English. Don't estimate revenue or market size.`,
+Be direct. Use simple language an everyday person would understand. Don't estimate revenue or market size.`,
     sources: ['govSelfEmployed', 'asaMoney', 'icoAI'],
   },
 
@@ -244,7 +244,7 @@ Be direct. Use British English. Don't estimate revenue or market size.`,
     prompt: `Below is an anonymised export of business card and bank transactions for the last 12 months (columns: date | payee | amount | description).
 """[paste or upload]"""
 
-1. Identify recurring payments (monthly, annual or usage-based). Output a table: payee | likely product | frequency | average monthly cost (£) | annual cost (£) | first seen | last seen | price change?
+1. Identify recurring payments (monthly, annual or usage-based). Output a table: payee | likely product | frequency | average monthly cost | annual cost | first seen | last seen | price change?
 2. Group them by job (e.g. email, design, storage, accounting) and flag any job with more than one tool.
 3. List payments you're unsure are subscriptions.
 4. Draft a short message I can send to colleagues asking who uses each flagged tool.
@@ -313,7 +313,7 @@ Don't recommend a supplier. This is not legal advice.`,
 """[paste emails]"""
 
 1. Sort each into: REPLY TODAY, DELEGATE (suggest to whom: [list roles]), READ LATER, IGNORE. Give a one-line reason.
-2. For REPLY TODAY messages that are routine, draft a reply under 100 words in a friendly, simple, everyday British English tone. Mark anything that needs a fact I must check as [CHECK].
+2. For REPLY TODAY messages that are routine, draft a reply under 100 words in a friendly tone, using simple language an everyday person would understand. Mark anything that needs a fact I must check as [CHECK].
 3. List every deadline or request with a date.
 Do not draft replies that agree to payments, contracts or sharing documents: flag those for me instead.`,
     sources: ['owaspAgency', 'icoAI'],
@@ -357,7 +357,7 @@ MY CV (personal contact details removed):
 2. For "partial" items, suggest clearer wording for what I've already written. Don't invent detail; ask me a question instead.
 3. For "missing" items, list them so I can decide whether to apply, and suggest honest ways to address them (for example, related experience I've described).
 4. Suggest a reordered CV outline that puts the most relevant experience first.
-5. Draft a cover letter under 250 words in simple, everyday British English, based only on the evidence above. Mark anything I must check as [CHECK].`,
+5. Draft a cover letter under 250 words in simple language an everyday person would understand, based only on the evidence above. Mark anything I must check as [CHECK].`,
     sources: ['ncsCv', 'ncsStar', 'ncsCareers'],
   },
   {
@@ -396,7 +396,7 @@ MY EXAMPLES (true, in rough notes, with confidential details removed):
 2. For each question, suggest which of my examples fits best, or tell me I don't have one yet.
 3. Then interview me: ask one question at a time and wait for my answer.
 4. After each answer, give short feedback: did it follow STAR (situation, task, action, result), was it too long, what follow-up question would you ask?
-Never add facts, figures or results to my examples. Use British English.`,
+Never add facts, figures or results to my examples. Use simple language an everyday person would understand.`,
     sources: ['ncsStar', 'ncsInterview'],
   },
   {
@@ -436,7 +436,7 @@ MY NOTES FOR THE YEAR (confidential names, clients and figures removed):
 3. List objectives with no evidence yet, so I can think of examples.
 4. Suggest two or three development goals as SMART objectives (specific, measurable, achievable, relevant, time-bound).
 5. List questions I could ask my manager in the review.
-Simple, everyday British English, first person, no exaggeration.`,
+Write in simple language an everyday person would understand, in the first person, with no exaggeration.`,
     sources: ['acasPerformance', 'acasAppraisal'],
   },
   {
@@ -479,7 +479,7 @@ PAY INFORMATION I'VE CHECKED (with sources):
 3. Do NOT suggest salary figures yourself. If I haven't given a sourced figure, write [CHECKED FIGURE NEEDED].
 4. Play my manager: raise the three most likely objections, one at a time, and let me answer each.
 5. Suggest a short opening line for the conversation.
-Simple, everyday British English. Firm, not confrontational.`,
+Use simple language an everyday person would understand. Firm, not confrontational.`,
     sources: ['ncsCareers', 'onsAshe', 'acasEqualPay'],
   },
   {
@@ -539,7 +539,7 @@ Don't tell me what to cancel. List the questions I should answer to decide.`,
       'How the sender’s answers compared with the AI’s explanation, which tells you how far to trust it next time.',
     ],
     evidence: 'No statistics cited. AI explanations can be wrong or miss the detail that matters, which is why this playbook treats the summary as a starting point. HMRC says it will only email you about a tax rebate, or ask for personal or payment information, from an address ending in hmrc.gov.uk, and will never send a tax rebate notification by text.',
-    prompt: `Explain this letter to me in simple, everyday British English. I've removed my personal details. This is to help me understand it, not legal, tax or financial advice.
+    prompt: `Explain this letter to me in simple language an everyday person would understand. I've removed my personal details. This is to help me understand it, not legal, tax or financial advice.
 """[paste the letter text]"""
 
 1. In three sentences: who it's from, what it's about and whether it asks me to do anything.
@@ -584,7 +584,7 @@ WHAT I WANT: [refund / repair / replacement / apology / something else]
 
 1. Write a short timeline of the facts, using only what I've told you.
 2. Draft the letter: a clear subject line, the facts, what I want, the evidence I'm enclosing, and a reasonable date to reply by.
-3. Don't quote laws or rights unless I've pasted them in from an official source. Instead, list the rights I should check with Citizens Advice.
+3. Don't quote laws or rights unless I've pasted them in from an official source. Instead, list the rights I should check with an official consumer-advice service.
 4. List any facts I've left out that the trader will probably ask for.
 Leave [MY NAME], [MY ADDRESS] and [ORDER NUMBER] as placeholders.`,
     sources: ['caTemplates', 'caFaulty', 'craReject', 'caConsumerHelp'],
@@ -620,7 +620,7 @@ WHAT I WANT: [describe it in your own words, e.g. "total of column D where colum
 OR EXPLAIN THIS FORMULA: [paste the formula]
 
 1. Give the formula, and say which cell it goes in.
-2. Explain it piece by piece in simple, everyday British English.
+2. Explain it piece by piece in simple language an everyday user would understand.
 3. Work out by hand what it should return for my sample rows, so I can compare.
 4. List awkward cases that could break it (blanks, text, duplicates, dates stored as text) and how to handle them.
 5. If a function you use isn't available in my program, say so and give an alternative.`,
@@ -654,9 +654,9 @@ OR EXPLAIN THIS FORMULA: [paste the formula]
 
 1. List any warning signs you can see (urgency, unexpected links, unusual payment methods, requests for codes, passwords or personal details, a sender that doesn't match the organisation it claims to be).
 2. Tell me how I could check it independently, without using any link, number or email address in the message.
-3. Tell me which official UK reporting route fits this kind of message.
+3. Tell me which kind of official reporting route fits this kind of message. Name the type of organisation to contact, not a phone number or link from the message.
 4. Don't tell me it's safe. You can't verify who sent it. If it could be genuine, tell me how to find out through official contact details.
-Simple, everyday British English, calm and short.`,
+Use simple language an everyday person would understand. Calm and short.`,
     sources: ['ncscPhishing', 'ncscReportEmail', 'reportFraud', 'caScamCheck', 'stopScams159'],
   },
   {
@@ -691,7 +691,7 @@ MY NOTES:
 1. Organise this into: summary; open items (item | status | next step | deadline | who to ask); regular tasks and when they happen; contacts by role; where documents are kept; decisions still pending.
 2. Flag anything that looks like a password, key or personal detail so I can remove it.
 3. List 10 questions the person covering is likely to ask that my notes don't answer.
-Use only my notes. Mark gaps as [TO ADD]. Simple, everyday British English.`,
+Use only my notes. Mark gaps as [TO ADD]. Use simple language an everyday person would understand.`,
     sources: ['icoAI'],
   },
 ];
@@ -818,7 +818,7 @@ What it must never do: [e.g. confirm a booking, offer a discount, share another 
 2. Include at least 4 "trick" cases where the input contains instructions the agent should ignore.
 3. Propose pass criteria I should agree before running the test.
 4. Give me a simple marking sheet: case | output | correct / fixable / wrong | note.
-Use British English and invented, clearly fictional details only.`,
+Use simple language an everyday person would understand, and invented, clearly fictional details only.`,
     sources: ['ncscAgentic', 'anthropicAgents', 'nistRmf', 'owaspTop10'],
   },
   {
@@ -882,9 +882,9 @@ Owner: [NAME]   Last reviewed: [DATE]   Next review: [DATE]
 Business: [what you do, number of staff]
 AI tools we use or plan to use: [list, with what each is for]
 Data we handle: [e.g. customer contact details, payroll, client files]
-Anything regulated: [e.g. FCA-regulated, health data, children's data, or "none"]
+Anything regulated: [e.g. a financial regulator, health data, children's data, or "none"]
 
-1. Rewrite the policy below for my business in simple, everyday British English, keeping it to one page.
+1. Rewrite the policy below for my business in simple language an everyday person would understand, keeping it to one page.
 2. Fill in sensible approval rules for each tool I listed.
 3. List any areas where I should get specialist advice (legal, data protection, regulatory) rather than rely on this policy.
 POLICY:

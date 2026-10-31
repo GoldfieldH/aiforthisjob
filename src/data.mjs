@@ -83,7 +83,7 @@ const baseUseCases = [
     ],
     evidence: 'In an independent study of 5,179 customer support agents, access to a generative AI assistant raised issues resolved per hour by 14% on average, with the biggest gains for newer staff (NBER Working Paper 31161). Your results will depend on your own volumes and content.',
     prompt: `You are a customer support assistant for [BUSINESS NAME].
-Tone: friendly, simple, everyday British English, no jargon, no more than 150 words.
+Tone: friendly, no jargon, no more than 150 words, in simple language an everyday person would understand.
 
 Use ONLY the policy and help text below. If the answer is not covered, say so and suggest the customer is passed to a human. Never invent prices, dates or promises.
 
@@ -124,7 +124,7 @@ Write: 1) a one-line summary of what the customer wants, 2) a draft reply, 3) an
     evidence: 'Vendors publish their own resolution-rate figures; treat these as vendor claims and test on your own traffic before committing.',
     prompt: `You are the website assistant for [BUSINESS NAME].
 Answer only from the KNOWLEDGE below. Keep answers under 80 words.
-If the question is about refunds over £[X], complaints, legal matters, or is not covered, reply:
+If the question is about refunds over [AMOUNT], complaints, legal matters, or is not covered, reply:
 "I'll pass this to the team. Could you share your name and email?"
 
 KNOWLEDGE:
@@ -168,7 +168,7 @@ Create 7 social posts from it:
 - 3 for LinkedIn (max 120 words, one clear takeaway each)
 - 3 for X (max 260 characters)
 - 1 for Instagram caption with a suggested image idea
-Each must stand alone, use British English, and contain no claims that aren't in the article. Number them and suggest the order to post them.`,
+Each must stand alone, use simple language an everyday person would understand, and contain no claims that aren't in the article. Number them and suggest the order to post them.`,
     sources: ['buffer'],
   },
   {
@@ -199,7 +199,7 @@ Topic: [TOPIC].
 2. Propose a page outline (H2/H3) that answers them in a logical order.
 3. Mark with [ADD YOUR EXPERIENCE] the places where I should add a real example, photo, price or opinion.
 4. Write a title (max 60 characters) and meta description (max 155 characters).
-Do not invent statistics, prices or quotes. British English.`,
+Do not invent statistics, prices or quotes. Use simple language an everyday person would understand.`,
     sources: ['googleAIContent'],
   },
   {
@@ -294,13 +294,13 @@ Here is a process I do by hand:
       'Days to close the month.',
     ],
     evidence: 'No independent figures are cited here. Vendors publish their own accuracy claims; check them on your own documents during a free trial.',
-    prompt: `I'm a UK small business on [cash/accrual] accounting, VAT registered: [yes/no].
+    prompt: `I'm a small business on [cash/accrual] accounting, registered for sales tax or VAT: [yes/no].
 Here is a list of transactions exported from my bank:
 """
 [paste rows: date, description, amount]
 """
 
-For each row, suggest: category | likely VAT treatment | confidence (high/medium/low) | question to ask my accountant if unsure.
+For each row, suggest: category | likely sales tax or VAT treatment | confidence (high/medium/low) | question to ask my accountant if unsure.
 Do not guess when unsure. Mark it low and ask.`,
     sources: ['dext', 'xero'],
   },
@@ -364,7 +364,7 @@ Screens:
 Data to store: [fields and types]
 Rules: [e.g. only admins can delete]
 
-Constraints: mobile friendly, simple, everyday British English labels, no personal data beyond [X], include a README explaining how to run it.
+Constraints: mobile friendly, labels in simple language an everyday user would understand, no personal data beyond [X], include a README explaining how to run it.
 Before writing code, list your assumptions and ask me up to 5 questions.`,
     sources: ['lovable', 'v0', 'replit', 'cursor', 'ncsc', 'ghCopilot'],
   },
@@ -435,9 +435,9 @@ Don't rewrite unrelated code.`,
     prompt: `Write a job advert for a [ROLE] at [BUSINESS], a [type of business] in [LOCATION].
 Key responsibilities: [list]
 Must-have skills: [max 5]
-Salary: [£ range]  Hours/location: [details]
+Salary: [pay range]  Hours/location: [details]
 
-Use simple, everyday British English, avoid jargon and gendered or age-coded language, and keep "must-haves" genuinely essential.
+Use simple language an everyday person would understand, avoid jargon and gendered or age-coded language, and keep "must-haves" genuinely essential.
 Then give 6 structured interview questions linked to the must-haves, each with what a strong answer looks like.`,
     sources: ['icoRec', 'icoAI'],
   },
@@ -623,7 +623,7 @@ const baseGuides = [
 <h2>2. Give it the material</h2>
 <p>Paste the policy, the email, the data. Ask it to use <em>only</em> that material and to say when something isn’t covered. This is the single biggest fix for made-up answers.</p>
 <h2>3. Be specific about the output</h2>
-<p>Length, format (table, bullets, email), tone, British English. If you want a table with certain columns, name the columns.</p>
+<p>Length, format (table, bullets, email), and tone. Ask for simple language an everyday person would understand. If you want a table with certain columns, name the columns.</p>
 <h2>4. Show an example</h2>
 <p>One example of a good answer is worth a paragraph of description.</p>
 <h2>5. Ask it to check itself</h2>
@@ -635,7 +635,7 @@ Use only the material below. If something isn't covered, say so.
 """
 [PASTE MATERIAL]
 """
-Output: [FORMAT, LENGTH, TONE]. British English.
+Output: [FORMAT, LENGTH, TONE]. Simple language an everyday person would understand.
 Finally, list anything you were unsure about.</code></pre>
 <p>Every use case in our library comes with a ready-to-use prompt built on this pattern.</p>
 `,
