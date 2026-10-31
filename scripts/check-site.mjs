@@ -64,7 +64,7 @@ for (const f of html) {
   if (!robots) { console.error(`NO ROBOTS META ${rel}`); errors++; }
   if (PREVIEW && !noindex) { console.error(`PREVIEW BUILD BUT INDEXABLE ${rel}`); errors++; }
   if (!noindex || PREVIEW) {
-    if (!rel.endsWith('404.html')) {
+    if (!rel.endsWith('404.html') && !rel.endsWith('thanks.html')) {
       for (const [k, v] of [['title', title], ['desc', desc]]) { if (seen[k].has(v)) { console.error(`DUPLICATE ${k} ${rel} = ${seen[k].get(v)}`); errors++; } else seen[k].set(v, rel); }
       const canon = (src.match(/<link rel="canonical" href="([^"]+)"/) || [])[1];
       if (!canon || !/^https:\/\//.test(canon)) { console.error(`NO ABSOLUTE CANONICAL ${rel}`); errors++; }
@@ -77,6 +77,19 @@ for (const f of html) {
   if (!og || !resolve(og)) { console.error(`MISSING og:image file ${rel}`); errors++; }
 }
 if (inSitemap.has('/404')) { console.error('404 page is in the sitemap'); errors++; }
+if (inSitemap.has('/thanks')) { console.error('thanks page is in the sitemap'); errors++; }
+const thanks = html.find((f) => f.endsWith('thanks.html'));
+if (!thanks) { console.error('MISSING thanks.html'); errors++; }
+else {
+  const robots = (readFileSync(thanks, 'utf8').match(/<meta name="robots" content="([^"]*)"/) || [])[1] || '';
+  if (robots !== 'noindex, follow') { console.error(`THANKS ROBOTS expected "noindex, follow", got "${robots}"`); errors++; }
+}
+const banned = /plain(?:[-\s]+)british english|plain(?:[-\s]+)english/i;
+for (const f of all) {
+  if (!/\.(html|xml|txt|css|js|svg)$/.test(f)) continue;
+  const src = readFileSync(f, 'utf8');
+  if (banned.test(src)) { console.error(`BANNED PHRASE in ${f.slice(DIST.length)}`); errors++; }
+}
 console.log(`mode: ${PREVIEW ? 'PREVIEW (noindex, robots.txt blocks all)' : 'LAUNCH (indexable)'}; ${inSitemap.size} sitemap URLs; ${warnings} warnings`);
 const feed = readFileSync(join(DIST, 'feed.xml'), 'utf8');
 if (/&(?!amp;|lt;|gt;|quot;|apos;|#)/.test(feed)) { console.error('feed.xml has unescaped &'); errors++; }

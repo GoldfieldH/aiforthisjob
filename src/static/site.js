@@ -27,18 +27,27 @@ if (st && location.pathname === '/newsletter') {
 }
 // Copy prompt
 document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', async () => {
-  const text = b.parentElement.querySelector('code').innerText;
-  try { await navigator.clipboard.writeText(text); b.textContent = 'Copied ✓'; } catch { b.textContent = 'Select and copy'; }
-  setTimeout(() => (b.textContent = 'Copy prompt'), 2000);
+  const label = b.dataset.label || 'Copy prompt';
+  const code = b.parentElement.querySelector('code');
+  if (!code) return;
+  try { await navigator.clipboard.writeText(code.innerText); b.textContent = 'Copied ✓'; } catch { b.textContent = 'Select and copy'; }
+  setTimeout(() => { b.textContent = label; }, 2000);
 }));
-// Use-case filter
-const grid = document.getElementById('uc-grid');
-if (grid) document.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
-  document.querySelectorAll('.chip').forEach((x) => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
-  c.classList.add('active'); c.setAttribute('aria-pressed', 'true');
-  const f = c.dataset.filter;
-  grid.querySelectorAll('.card').forEach((card) => { card.style.display = f === 'all' || card.dataset.cat === f ? '' : 'none'; });
-}));
+// Filters (ideas by job, and little useful things). Items tagged "both" stay visible in Work and Home.
+document.querySelectorAll('.filters[data-filter-for]').forEach((bar) => {
+  const grid = document.getElementById(bar.dataset.filterFor);
+  if (!grid) return;
+  bar.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
+    bar.querySelectorAll('.chip').forEach((x) => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
+    c.classList.add('active'); c.setAttribute('aria-pressed', 'true');
+    const f = c.dataset.filter;
+    grid.querySelectorAll('[data-cat],[data-aud]').forEach((card) => {
+      const key = card.dataset.cat || card.dataset.aud;
+      const show = f === 'all' || key === f || key === 'both';
+      card.style.display = show ? '' : 'none';
+    });
+  }));
+});
 // ROI calculator
 const roi = document.getElementById('roi');
 if (roi) {
@@ -64,7 +73,7 @@ if (roi) {
   roi.addEventListener('input', calc); calc();
 }
 
-// ---------- Motion: scroll reveal, parallax fallback, progress fallback, TOC highlight ----------
+// ---------- Motion: scroll reveal, progress fallback, TOC highlight ----------
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveals = document.querySelectorAll('.reveal');
@@ -79,15 +88,6 @@ if (roi) {
     reveals.forEach((el) => io.observe(el));
   }
   const cssScroll = window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()');
-  // Parallax fallback for browsers without scroll-driven animations (transform only; no layout work)
-  const layers = [...document.querySelectorAll('.layers .layer')];
-  if (!reduce && !cssScroll && layers.length) {
-    let ticking = false, visible = true;
-    const host = layers[0].closest('.hero, .section-hero');
-    if (host && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(host);
-    const update = () => { ticking = false; if (!visible) return; const y = scrollY; layers.forEach((l) => l.style.setProperty('--y', (y * parseFloat(l.dataset.speed || 0.3)).toFixed(1) + 'px')); };
-    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  }
   // Reading progress fallback
   const bar = document.querySelector('.progress span');
   if (bar && !cssScroll) {

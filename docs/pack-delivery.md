@@ -34,6 +34,23 @@ Sandbox ids (account `acct_1UVgkC5sR1r9qUgp`, test mode):
 
 Live mode has different ids: replace these when the live Payment Links exist.
 
+## Payment link redirect (Dashboard only)
+
+The site does not set this. Stripe Payment Links send the browser somewhere after payment only if you turn the redirect on. Do it for **each** pack link the site already sells (the three `PACK_LINK_*` links), in test mode and again in live mode. Edit the existing links. A new link would need a new env value and a redeploy, and the Buy buttons would keep pointing at the old one until then.
+
+For each Payment Link:
+
+1. Stripe Dashboard → **Product catalogue** → **Payment Links** (or **Payment links** in the search box). Switch to **Test mode** first.
+2. Open the link → **Edit**.
+3. Find **After payment**.
+4. Choose **Don’t show confirmation page**.
+5. In the URL field that appears, enter exactly `https://www.aiforthisjob.com/thanks`
+6. Save.
+
+Repeat for the email, meeting-admin and investment-ops links. Then repeat all three in **live mode** when those live links exist.
+
+Don’t append `{CHECKOUT_SESSION_ID}` unless you mean to. The thank-you page doesn’t read it. The download still arrives by email from the webhook. The page only tells the buyer to check that inbox.
+
 ## Setup steps
 ### 1. Private storage (Vercel Blob, no new account)
 1. Vercel → `aiforthisjob` → Storage → Create → Blob → Access **Private** → name `aiforthisjob-packs` (region London `lhr1` if offered) → connect to Production and Preview. This adds `BLOB_READ_WRITE_TOKEN`.

@@ -1,13 +1,14 @@
 // Content for AIForThisJob. British English. Public sources only.
 // Rule: never invent statistics. Vendor claims are labelled as such.
 import { newSources, newCategories, newUseCases, newGuides, sections as sectionList } from './data-sections.mjs';
+import { pathSources } from './data-paths.mjs';
 
 export const categories = [
   { slug: 'customer-support', name: 'Customer support', blurb: 'Answer customers faster without losing the human touch.' },
   { slug: 'marketing', name: 'Marketing and social', blurb: 'Plan, write and repurpose content without starting from a blank page.' },
   { slug: 'admin', name: 'Admin and productivity', blurb: 'Meetings, inboxes, documents and the glue work between apps.' },
   { slug: 'finance', name: 'Finance and bookkeeping', blurb: 'Get receipts, invoices and numbers where they need to be.' },
-  { slug: 'software', name: 'Building software', blurb: 'Vibe coding, internal tools and fixing what the AI wrote.' },
+  { slug: 'software', name: 'Building software', blurb: 'Small work apps you describe in your own words, and fixing what the AI wrote.' },
   { slug: 'hr', name: 'HR and recruitment', blurb: 'Hiring admin, done carefully and lawfully.' },
   { slug: 'gaming', name: 'Gaming and indie dev', blurb: 'Concepts, quest text and game-jam speed.' },
   { slug: 'investment-operations', name: 'Investment operations', blurb: 'Reconciliations, trade exceptions, onboarding and the controls around them.' },
@@ -53,7 +54,7 @@ const S = {
   gresham: { title: 'Gresham (product page)', url: 'https://www.greshamtech.com/', kind: 'Vendor page' },
   fenergo: { title: 'Fenergo (product page)', url: 'https://www.fenergo.com/', kind: 'Vendor page' },
 };
-Object.assign(S, newSources);
+Object.assign(S, newSources, pathSources);
 export const sources = S;
 export const sections = sectionList;
 const T_MVP = '2026-10-29T00:14:53Z';
@@ -82,7 +83,7 @@ const baseUseCases = [
     ],
     evidence: 'In an independent study of 5,179 customer support agents, access to a generative AI assistant raised issues resolved per hour by 14% on average, with the biggest gains for newer staff (NBER Working Paper 31161). Your results will depend on your own volumes and content.',
     prompt: `You are a customer support assistant for [BUSINESS NAME].
-Tone: friendly, plain British English, no jargon, no more than 150 words.
+Tone: friendly, simple, everyday British English, no jargon, no more than 150 words.
 
 Use ONLY the policy and help text below. If the answer is not covered, say so and suggest the customer is passed to a human. Never invent prices, dates or promises.
 
@@ -237,10 +238,10 @@ Only include what was actually said. Flag anything ambiguous.`,
     sources: ['meet', 'otter', 'fireflies', 'icoAI'],
   },
   {
-    slug: 'automate-repetitive-workflows', cat: 'admin',
+    slug: 'automate-repetitive-workflows', cat: 'admin', updated: '2026-10-31T12:00:00Z',
     title: 'Automate repetitive work between your apps',
-    summary: 'Connect your forms, inbox, spreadsheet and CRM so routine steps happen on their own, with AI handling the reading and sorting.',
-    job: 'Every new enquiry means copying details from an email into a spreadsheet, then into your CRM, then sending a reply.',
+    summary: 'Connect your forms, inbox and spreadsheet so routine steps happen on their own, with AI doing the reading and sorting.',
+    job: 'Every new enquiry means copying details from an email into a spreadsheet, then into a customer list (sometimes called a CRM), then sending a reply.',
     whatAIDoes: [
       'Reads unstructured text (an email, a form answer) and pulls out names, dates and requests.',
       'Sorts items into categories and routes them to the right place or person.',
@@ -332,9 +333,9 @@ If something isn't in the documents, say "not stated".`,
     sources: ['notebooklm', 'icoAI'],
   },
   {
-    slug: 'vibe-code-an-internal-tool', cat: 'software',
-    title: 'Vibe-code a small internal tool',
-    summary: 'Describe the tool you want in plain English and let an AI app builder generate a working first version you can test and refine.',
+    slug: 'vibe-code-an-internal-tool', cat: 'software', updated: '2026-10-31T12:00:00Z',
+    title: 'Build a simple work app by describing it',
+    summary: 'Describe the small app you need in your own words. An AI builder makes a first version you can click through and correct.',
     job: 'You need a simple booking form, tracker or dashboard and can’t justify hiring a developer.',
     whatAIDoes: [
       'Generates a working app from a written description.',
@@ -363,17 +364,17 @@ Screens:
 Data to store: [fields and types]
 Rules: [e.g. only admins can delete]
 
-Constraints: mobile friendly, plain British English labels, no personal data beyond [X], include a README explaining how to run it.
+Constraints: mobile friendly, simple, everyday British English labels, no personal data beyond [X], include a README explaining how to run it.
 Before writing code, list your assumptions and ask me up to 5 questions.`,
     sources: ['lovable', 'v0', 'replit', 'cursor', 'ncsc', 'ghCopilot'],
   },
   {
     slug: 'explain-and-fix-code-errors', cat: 'software',
     title: 'Explain and fix a cryptic error',
-    summary: 'Paste an error and the code around it; AI explains what went wrong in plain English and proposes a fix you can test.',
+    summary: 'Paste an error and the code around it. You get an explanation you can follow, and a fix you can test.',
     job: 'Your AI-generated project broke, the error message means nothing to you, and you’re going round in circles.',
     whatAIDoes: [
-      'Translates the error into plain English.',
+      'Explains the error in words you can follow.',
       'Identifies the likely cause and proposes the smallest fix.',
       'Suggests how to test that it’s really fixed.',
     ],
@@ -402,7 +403,7 @@ CODE (file name and contents):
 What I was trying to do: [one sentence]
 What changed just before it broke: [if known]
 
-1. Explain the error in plain English.
+1. Explain the error in everyday words.
 2. Give the most likely cause.
 3. Show the smallest change that fixes it.
 4. Tell me how to check it worked.
@@ -436,7 +437,7 @@ Key responsibilities: [list]
 Must-have skills: [max 5]
 Salary: [£ range]  Hours/location: [details]
 
-Use plain British English, avoid jargon and gendered or age-coded language, and keep "must-haves" genuinely essential.
+Use simple, everyday British English, avoid jargon and gendered or age-coded language, and keep "must-haves" genuinely essential.
 Then give 6 structured interview questions linked to the must-haves, each with what a strong answer looks like.`,
     sources: ['icoRec', 'icoAI'],
   },
@@ -591,7 +592,7 @@ You are not making a risk decision. Never fill gaps with assumptions.`,
 const baseGuides = [
   {
     slug: 'what-is-an-ai-agent',
-    title: 'What is an AI agent? A plain-English guide',
+    title: 'What is an AI agent?',
     summary: 'The difference between a chatbot, a workflow and an agent, and how to tell which one your problem actually needs.',
     body: `
 <p>“Agent” is used loosely. In practice there are three levels, and most real business value today sits in the first two.</p>
@@ -660,7 +661,7 @@ Finally, list anything you were unsure about.</code></pre>
 <p>Track errors, complaints, rework and customer satisfaction alongside time. A faster process that creates more rework hasn’t paid back.</p>
 <h2>Step 5: Decide at a fixed date</h2>
 <p>Set a review date (say 60 or 90 days) and a threshold in advance: keep, change or stop. This is how you avoid pilots that never end.</p>
-<p><a class="btn" href="/roi-calculator">Try the free ROI calculator →</a></p>
+<p><a class="btn" href="/roi-calculator">Try the free ROI calculator</a></p>
 `,
     sources: ['boe', 'govAdoption', 'gartner'],
   },
