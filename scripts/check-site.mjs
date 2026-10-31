@@ -90,6 +90,16 @@ for (const f of all) {
   const src = readFileSync(f, 'utf8');
   if (banned.test(src)) { console.error(`BANNED PHRASE in ${f.slice(DIST.length)}`); errors++; }
 }
+// Copyable prompts are country-neutral. Site copy may still say "British English".
+const promptBanned = /british(?:[-\s]+)english|plain(?:[-\s]+)english/i;
+for (const f of html) {
+  const src = readFileSync(f, 'utf8');
+  const rel = '/' + f.slice(DIST.length);
+  for (const m of src.matchAll(/<pre class="prompt"><code>([\s\S]*?)<\/code><\/pre>/g)) {
+    const text = m[1].replace(/<[^>]+>/g, '');
+    if (promptBanned.test(text)) { console.error(`BANNED PHRASE IN PROMPT ${rel}`); errors++; }
+  }
+}
 console.log(`mode: ${PREVIEW ? 'PREVIEW (noindex, robots.txt blocks all)' : 'LAUNCH (indexable)'}; ${inSitemap.size} sitemap URLs; ${warnings} warnings`);
 const feed = readFileSync(join(DIST, 'feed.xml'), 'utf8');
 if (/&(?!amp;|lt;|gt;|quot;|apos;|#)/.test(feed)) { console.error('feed.xml has unescaped &'); errors++; }

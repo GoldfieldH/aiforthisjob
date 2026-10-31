@@ -43,7 +43,7 @@ export const littleThings = [
 2. What I need from the reader, in one line.
 3. By when, or "no deadline" if I didn't give one.
 
-Keep my meaning. Take out apologies, backstory and softener phrases. British English. If the email is cross, make this version calm and factual. Do not add promises, dates or facts that are not in the email.
+Keep my meaning. Take out apologies, backstory and softener phrases. Use simple language an everyday person would understand. If the email is cross, make this version calm and factual. Do not add promises, dates or facts that are not in the email.
 
 EMAIL:
 """
@@ -63,7 +63,7 @@ EMAIL:
     why: 'Sorting a list is a job chat tools are actually good at, because you already wrote the raw material. They are poor at knowing which meeting is immovable or which day you are tired, unless you say so. The useful part is the grouping, not a fantasy of a perfect week.',
     prompt: `Turn this messy list into a one-week plan. I will edit it.
 
-Fixed things I cannot move: [meetings, school run, shifts, or "none"]
+Fixed things I cannot move: [meetings, school drop-off, shifts, or "none"]
 Days I have less energy or less time: [e.g. Thursday afternoon]
 Roughly how long I can spend on this list each weekday: [e.g. 45 minutes]
 
@@ -133,7 +133,7 @@ If I have only given you one option, say so and ask what the alternative is.`,
     audience: 'work',
     title: 'Tidy rambling notes into decisions and actions',
     why: 'Notes fail when decisions and jobs are mixed in with chatter. Asking for three piles (decided, to do, still open) matches how people actually use notes afterwards. If the notes never said who owns a job, the draft should leave that blank.',
-    prompt: `Sort these notes. Only use what is written. British English.
+    prompt: `Sort these notes. Only use what is written. Use simple language an everyday person would understand.
 
 NOTES:
 """
@@ -158,7 +158,7 @@ Do not add tasks I did not write.`,
     audience: 'work',
     title: 'Explain a spreadsheet formula before you trust it',
     why: 'A formula that runs is not a formula that means what you think. A reading in everyday words, including what a blank cell does, takes about a minute. Check the function name on the vendor’s own list. Test it on a copy.',
-    prompt: `Explain this spreadsheet formula in simple, everyday British English. The app is [Excel or Google Sheets].
+    prompt: `Explain this spreadsheet formula in simple language an everyday user would understand. The app is [Excel or Google Sheets].
 
 FORMULA:
 """
@@ -210,7 +210,7 @@ Cut throat-clearing and repeated points. Do not soften a real problem into "all 
     audience: 'home',
     title: 'Explain this letter without the jargon',
     why: 'Official letters are written for the sender’s process, not for you. A plain restatement shows what it is asking and by when. It is not advice. If money, tax, benefits or a court is involved, act on the letter and a proper source, not on the summary. Take your personal details out before you paste.',
-    prompt: `Explain this letter in simple, everyday British English. I have removed my name, address and reference numbers. This is to help me understand the words, not legal, tax or financial advice.
+    prompt: `Explain this letter in simple language an everyday person would understand. I have removed my name, address and reference numbers. This is to help me understand the words, not legal, tax or financial advice.
 
 LETTER:
 """
@@ -235,13 +235,13 @@ If the letter does not say something, write "not stated". Do not guess.`,
     audience: 'home',
     title: 'Meals from what is actually in the fridge',
     why: 'Meal planning stalls when the plan ignores the food you already have. A short list of meals from those ingredients is more useful than a new recipe hobby. This is not a diet and not medical advice. If you have a condition with a prescribed diet, follow that. The NHS Eatwell Guide is general healthy-eating guidance for most people, not a meal plan for you.',
-    prompt: `Suggest four simple meals I can cook from what I already have. British English. This is not medical or diet advice.
+    prompt: `Suggest four simple meals I can cook from what I already have. Use simple language an everyday person would understand. This is not medical or diet advice.
 
 What I have: [list food in the fridge, freezer and cupboard that you are willing to use]
 People eating: [how many, and ages only if it changes the meal, e.g. young children]
 Avoid: [allergies, foods you won't eat, or "none"]
 Time I have on a weeknight: [e.g. 30 minutes]
-Cooker and kit: [e.g. hob and oven, no blender]
+Kitchen kit: [e.g. stove and oven, no blender]
 
 For each meal: a name, the ingredients from my list it uses, and the steps in short lines.
 Then list a few cheap staples that would make another meal possible, marked as "I may not have these".
@@ -286,7 +286,7 @@ Give me:
     audience: 'both',
     title: 'Teach me this, then check I followed',
     why: 'A wall of explanation is hard to trust and hard to remember. A short explanation, one example, and three questions gives you something to push back on. Ask it what it might be wrong about. For health, money or the law, use a proper source rather than a lesson from a chat tool.',
-    prompt: `Explain [TOPIC] to me. I am new to it. British English, short sentences.
+    prompt: `Explain [TOPIC] to me. I am new to it. Use simple language an everyday person would understand, and short sentences.
 
 Then:
 1. Five bullets I could reread tomorrow.
@@ -371,7 +371,7 @@ What is true: [the facts you are willing to say]
 What I can offer: [or "I can't offer anything yet"]
 What I will not promise: [or "nothing specific"]
 Relationship: [e.g. a customer, my sister, a colleague I don't know well]
-Length: under 120 words. British English.
+Length: under 120 words. Use simple language an everyday person would understand.
 
 Write one reply. After it, list any place you had to guess, so I can fix those words.
 Do not apologise on my behalf for things I did not mention.`,
