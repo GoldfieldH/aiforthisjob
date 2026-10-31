@@ -409,8 +409,36 @@ const thingLinks = (slugs) => linkList(slugs.map((slug) => ({ href: `/little-thi
 page({
   path: '/start', title: startGuide.title, description: startGuide.description, type: 'article',
   lastmod: ADDED, published: ADDED, modified: ADDED,
-  jsonld: [crumbsLd([['Home', '/'], ['Start here', '/start']]), articleLd({ headline: startGuide.title, description: startGuide.description, path: '/start', added: ADDED, extra: { citation: startGuide.sources.map((k) => sources[k].url) } })],
-  body: `<header class="article-hero"><div class="wrap narrow">${crumbsHtml([['Home', '/'], ['Start here', '/start']])}<p class="eyebrow">About five minutes</p><h1 class="display-s">${esc(startGuide.title)}</h1><p class="lede">${esc(startGuide.lede)}</p><p class="meta"><a href="/get-done">I already know the task</a> · <a href="/at-work">This is for work</a></p></div></header>
+  jsonld: [crumbsLd([['Home', '/'], ['Start here', '/start']]), articleLd({ headline: startGuide.title, description: startGuide.description, path: '/start', added: ADDED, extra: { citation: startGuide.sources.map((k) => sources[k].url) } }), {
+    '@context': 'https://schema.org', '@type': 'VideoObject',
+    name: 'Start here: a 70-second welcome',
+    description: 'A 70-second welcome: you’ve got the tools, handing one a job instead of only asking questions, and three habits for doing it safely. This page takes about five minutes.',
+    thumbnailUrl: `${SITE}/media/welcome-poster.png`,
+    uploadDate: '2026-10-31',
+    duration: 'PT1M10S',
+    contentUrl: `${SITE}/media/welcome.mp4`,
+  }],
+  body: `<header class="article-hero"><div class="wrap narrow">${crumbsHtml([['Home', '/'], ['Start here', '/start']])}<p class="eyebrow">About five minutes</p><h1 class="display-s">${esc(startGuide.title)}</h1>
+<section class="welcome" id="welcome" aria-labelledby="welcome-h">
+<h2 id="welcome-h">Start here: a 70-second welcome</h2>
+<figure class="welcome-player">
+<video controls preload="metadata" playsinline poster="/media/welcome-poster.png" width="1920" height="1080">
+<source src="/media/welcome.mp4" type="video/mp4">
+<track kind="captions" src="/media/welcome.vtt" srclang="en" label="English">
+<p>Your browser can’t play this clip. The written version is just below.</p>
+</video>
+<figcaption>Asking questions is a start. This clip shows how to hand a tool a real job, safely, whatever work you do. <span class="muted">Original background music made for this site.</span></figcaption>
+</figure>
+<h3>The same welcome, if you’d rather read</h3>
+<ul>
+<li>You’ve got the tools. Maybe someone at work said “find a way to use this”, or you downloaded an app and stared at the empty box.</li>
+<li>Most people stop at asking questions. That’s fine, but it’s the smallest thing these tools can do. Hand it a job instead. Say you’re a fitness coach. Tell it about your client: forty-two, a sore knee, three sessions a week, and a goal to run ten kilometres in twelve weeks. Ask for the twelve-week plan, a short check-in for each week, and easy swaps if the knee flares up. You get a first draft in a couple of minutes. You still check it. You’re the coach.</li>
+<li>Doing it safely comes down to three habits. Only share what you’re allowed to share. Check anything that matters. And read it before you send it.</li>
+<li>You’ll find ideas for your job, little things to try at home, and short clips like this one. Whatever industry you’re in, there’s something here: finance, marketing, healthcare, hospitality, construction, education, and plenty more.</li>
+<li>The best place to begin is this page. It takes about five minutes.</li>
+</ul>
+</section>
+<p class="lede">${esc(startGuide.lede)}</p><p class="meta"><a href="/get-done">I already know the task</a> · <a href="/at-work">This is for work</a></p></div></header>
 <div class="wrap narrow"><article class="article">
 ${stepsHtml(startGuide.steps)}
 ${promptBlock(goalPrompt({ thing: startGuide.promptThing }), 'Your first prompt')}
@@ -782,8 +810,11 @@ ${entries.map((e) => `<item>
 `);
 
 // ---------- static assets ----------
-const assets = ['styles.css', 'site.js', 'favicon.svg', 'logo.png', 'apple-touch-icon.png', 'og/default.png'];
-mkdirSync(join(OUT, 'og'), { recursive: true });
-for (const f of assets) copyFileSync(new URL(`./static/${f}`, import.meta.url), join(OUT, f));
+const assets = ['styles.css', 'site.js', 'favicon.svg', 'logo.png', 'apple-touch-icon.png', 'og/default.png', 'media/welcome.mp4', 'media/welcome-poster.png', 'media/welcome.vtt'];
+for (const f of assets) {
+  const dest = join(OUT, f);
+  mkdirSync(dirname(dest), { recursive: true });
+  copyFileSync(new URL(`./static/${f}`, import.meta.url), dest);
+}
 files.push(...assets);
 console.log(`Built ${files.length} files to dist/ (SITE=${SITE}, PREVIEW=${PREVIEW}, MODE=${PREVIEW ? 'PREVIEW' : 'LAUNCH'})`);
