@@ -1,6 +1,6 @@
 # AIForThisJob
 
-A free, UK-based library of practical AI use cases organised by job and industry, with plain-English guides, a free ROI calculator and (later) paid prompt/agent-config packs.
+A free, UK-based library of practical AI use cases organised by job and industry, with short guides, a free ROI calculator and (later) paid prompt packs.
 
 Static site generator with **no dependencies** (Node 18+). Content lives in `src/data.mjs`, page templates in `src/build.mjs`, CSS/JS/favicon in `src/static/`.
 
