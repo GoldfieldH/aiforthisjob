@@ -73,7 +73,7 @@ if (roi) {
   roi.addEventListener('input', calc); calc();
 }
 
-// ---------- Motion: scroll reveal, parallax fallback, progress fallback, TOC highlight ----------
+// ---------- Motion: scroll reveal, progress fallback, TOC highlight ----------
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveals = document.querySelectorAll('.reveal');
@@ -88,15 +88,6 @@ if (roi) {
     reveals.forEach((el) => io.observe(el));
   }
   const cssScroll = window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()');
-  // Parallax fallback for browsers without scroll-driven animations (transform only; no layout work)
-  const layers = [...document.querySelectorAll('.layers .layer')];
-  if (!reduce && !cssScroll && layers.length) {
-    let ticking = false, visible = true;
-    const host = layers[0].closest('.hero, .section-hero');
-    if (host && 'IntersectionObserver' in window) new IntersectionObserver(([e]) => { visible = e.isIntersecting; }).observe(host);
-    const update = () => { ticking = false; if (!visible) return; const y = scrollY; layers.forEach((l) => l.style.setProperty('--y', (y * parseFloat(l.dataset.speed || 0.3)).toFixed(1) + 'px')); };
-    addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  }
   // Reading progress fallback
   const bar = document.querySelector('.progress span');
   if (bar && !cssScroll) {

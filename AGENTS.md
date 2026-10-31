@@ -43,7 +43,7 @@ Sound like a friendly person who knows the subject and is talking to one reader.
 - Short sentences. A specific example beats an abstraction.
 - Say what the page is for, and what to do next.
 - Admit limits. These tools get things wrong. Time saved is not money saved unless the time is actually used.
-- Don’t use the phrase “plain English” anywhere on the site. Say “in your own words” or “in words you’d use yourself” if you need that idea.
+- Don’t use “plain English” or “plain British English” anywhere on the site, including prompts. Say “simple, everyday British English”, or “in your own words”, if you need that idea. `npm run check` fails if either banned phrase is in the built output.
 - Don’t write “whether you’re X or Y” openers, “everything you need”, “unlock”, “supercharge”, “dive in”, “game-changer”, “seamless”, “in today’s fast-paced world”, stacks of three adjectives, or a sentence held up by em dashes.
 - No hype, no invented numbers, no income promises. Vendor claims stay labelled. Sources stay on every entry.
 - The free pages have to be useful on their own. Packs are a one-off payment, no subscription, and they’re optional. Keep the UK cancellation wording on the packs page intact.

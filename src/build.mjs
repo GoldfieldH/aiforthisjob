@@ -80,12 +80,18 @@ const navLinks = [
   ['/packs', 'Packs', (p) => p === '/packs'],
 ];
 
-function page({ path, title, description, body, jsonld = [], type = 'website', progress = false, bodyClass = '', lastmod = null, published = null, modified = null, noindex = false, sitemap = true, file = null }) {
+function page({ path, title, description, body, jsonld = [], type = 'website', progress = false, bodyClass = '', lastmod = null, published = null, modified = null, noindex = false, noindexFollow = false, sitemap = true, file = null }) {
   const url = SITE + (path === '/' ? '/' : path);
   const fullTitle = path === '/' ? title : seoTitle(title);
   description = metaDesc(description);
-  if (sitemap && !noindex) urls.push({ path, lastmod });
-  const robots = PREVIEW || noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1';
+  const unlisted = noindex || noindexFollow;
+  if (sitemap && !unlisted) urls.push({ path, lastmod });
+  // Previews are noindex,nofollow. /thanks stays noindex,follow even then, so the production meta is what we ship and what check asserts.
+  const robots = noindexFollow
+    ? 'noindex, follow'
+    : PREVIEW || noindex
+      ? 'noindex, nofollow'
+      : 'index, follow, max-image-preview:large, max-snippet:-1';
   const ld = jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`).join('\n');
   const isCurrent = (href) => path === href || path.startsWith(href + '/');
   const html = `<!doctype html>
@@ -95,7 +101,7 @@ function page({ path, title, description, body, jsonld = [], type = 'website', p
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(fullTitle)}</title>
 <meta name="description" content="${esc(description)}">
-${noindex ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robots" content="${robots}">
+${unlisted ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robots" content="${robots}">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
@@ -189,8 +195,6 @@ const audLabel = { work: 'At work', home: 'At home', both: 'Work or home', eithe
 
 const moneyDisclaimer = `<div class="callout warn disclaimer" role="note"><strong>No income promises.</strong> ${esc(secBy['make-money-with-ai'].disclaimer)}</div>`;
 
-const layers = `<div class="layers" aria-hidden="true"><span class="layer l1" data-speed="0.25"></span><span class="layer l2" data-speed="0.45"></span><span class="layer l3" data-speed="0.65"></span><span class="layer grid-lines" data-speed="0.1"></span></div>`;
-
 // All entries for Latest / RSS (newest first; ties keep later-defined content first)
 const entries = [
   ...useCases.map((u, i) => ({ kind: 'Use case', path: `/use-cases/${u.slug}`, title: u.title, summary: u.summary, added: u.added, section: u.section, cat: catBy[u.cat].name, order: i })),
@@ -217,7 +221,7 @@ page({
   description: 'You’ve got the AI tools. Now what? A first page if you’re new, a first week if work just switched a tool on, and ideas for the job you do.',
   jsonld: [orgLd, siteLd], bodyClass: 'home',
   body: `
-<section class="hero">${layers}<div class="wrap hero-inner">
+<section class="hero"><div class="wrap hero-inner">
 <p class="eyebrow">Free AI ideas for real jobs</p>
 <h1 class="display">You’ve got the AI tools.<br><span class="grad">Now what?</span></h1>
 <p class="lede">The tool is the easy bit. Knowing what to try first is the hard bit. If you’ve never typed a prompt, start here. If work just turned one on, there’s a page for that week. If you already know the job, go straight to the ideas.</p>
@@ -285,7 +289,7 @@ for (const s of sections) {
     path: `/${s.slug}`, title: sectionTitles[s.slug] || `${s.name}: practical guides and use cases`, lastmod: latestOf([...ucs, ...gds]),
     description: s.intro,
     jsonld: [crumbsLd(crumbs), { '@context': 'https://schema.org', '@type': 'CollectionPage', name: s.name, description: s.intro, inLanguage: 'en-GB', url: `${SITE}/${s.slug}`, mainEntity: { '@type': 'ItemList', itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + it.url, name: it.name })) } }],
-    body: `<section class="section-hero ${panelTone[s.slug]}">${layers}<div class="wrap">${crumbsHtml(crumbs)}<p class="eyebrow">${esc(s.eyebrow)}</p><h1 class="display">${esc(s.headline)}</h1><p class="lede">${esc(s.intro)}</p></div></section>
+    body: `<section class="section-hero ${panelTone[s.slug]}"><div class="wrap">${crumbsHtml(crumbs)}<p class="eyebrow">${esc(s.eyebrow)}</p><h1 class="display">${esc(s.headline)}</h1><p class="lede">${esc(s.intro)}</p></div></section>
 <div class="wrap section sticky-layout">
 <aside class="sticky-col"><div class="sticky-inner"><h2 class="sr">About this section</h2>${aside}<p class="muted small">${items.length} entries · <a href="/latest">See what’s new</a></p></div></aside>
 <div class="scroll-col">${lists}</div>
@@ -572,7 +576,7 @@ ${PACKS_ON_SALE ? waiver : '<p>Prices are provisional and nothing is on sale yet
 
 // ---------- Thank you (Stripe Payment Links redirect here) ----------
 page({
-  path: '/thanks', title: 'Your pack is on its way',
+  path: '/thanks', title: 'Your pack is on its way', noindexFollow: true, sitemap: false,
   description: 'You’ve paid for a pack. The download link goes to the email you used at checkout. It can take a couple of minutes, and the link works for 7 days.',
   lastmod: ADDED,
   jsonld: [crumbsLd([['Home', '/'], ['Your pack', '/thanks']])],
@@ -585,7 +589,7 @@ page({
 <ol class="steps">
 <li><h2>Check your inbox</h2><p>Look for a message to the address you used at checkout. Give it a couple of minutes, and check spam if it’s quiet.</p></li>
 <li><h2>Download the zip</h2><p>The link in that email works for 7 days. If it expires, email ${SUPPORT} with your order reference and we’ll send a new one.</p></li>
-<li><h2>Tell us if the file is wrong</h2><p>If it won’t open, or it isn’t the pack you ordered, email ${SUPPORT}. We’ll fix it, send the right file, or refund you.</p></li>
+<li><h2>Tell us if the file is wrong</h2><p>If it won’t open, or it isn’t the pack you ordered, email ${SUPPORT}. We’ll put it right.</p></li>
 </ol>
 <p>If you paid by a method that takes time to clear, the email goes out when the payment clears, not the moment you click pay.</p>
 <div class="callout"><strong>While you wait.</strong> The free prompts are still there. <a href="/start">Start here</a> if you’re new, or <a href="/at-work">the first week at work</a> if that’s you. <a href="/little-things">Copy a small prompt</a>.</div>

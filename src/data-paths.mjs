@@ -10,6 +10,16 @@ export const pathSources = {
     url: 'https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/the-eatwell-guide/',
     kind: 'NHS guidance',
   },
+  chatgptHome: {
+    title: 'ChatGPT',
+    url: 'https://chatgpt.com/',
+    kind: 'Vendor page',
+  },
+  claudeHome: {
+    title: 'Claude',
+    url: 'https://claude.ai/',
+    kind: 'Vendor page',
+  },
   geminiHome: {
     title: 'Google Gemini',
     url: 'https://gemini.google.com/',
@@ -148,7 +158,7 @@ Do not add tasks I did not write.`,
     audience: 'work',
     title: 'Explain a spreadsheet formula before you trust it',
     why: 'A formula that runs is not a formula that means what you think. A reading in everyday words, including what a blank cell does, takes about a minute. Check the function name on the vendor’s own list. Test it on a copy.',
-    prompt: `Explain this spreadsheet formula in plain British English. The app is [Excel or Google Sheets].
+    prompt: `Explain this spreadsheet formula in simple, everyday British English. The app is [Excel or Google Sheets].
 
 FORMULA:
 """
@@ -200,7 +210,7 @@ Cut throat-clearing and repeated points. Do not soften a real problem into "all 
     audience: 'home',
     title: 'Explain this letter without the jargon',
     why: 'Official letters are written for the sender’s process, not for you. A plain restatement shows what it is asking and by when. It is not advice. If money, tax, benefits or a court is involved, act on the letter and a proper source, not on the summary. Take your personal details out before you paste.',
-    prompt: `Explain this letter in plain British English. I have removed my name, address and reference numbers. This is to help me understand the words, not legal, tax or financial advice.
+    prompt: `Explain this letter in simple, everyday British English. I have removed my name, address and reference numbers. This is to help me understand the words, not legal, tax or financial advice.
 
 LETTER:
 """
@@ -560,6 +570,8 @@ export const startGuide = {
         'On a computer, open the tool’s website and look for Sign up, Try, or a chat box. On a phone, the website or the app store both work. Use an email address you are happy to receive mail at. When you can type into an empty box, you are ready. You don’t need to learn the settings.',
       ],
       links: [
+        { href: 'https://chatgpt.com/', label: 'ChatGPT' },
+        { href: 'https://claude.ai/', label: 'Claude' },
         { href: 'https://gemini.google.com/', label: 'Google Gemini' },
         { href: 'https://copilot.microsoft.com/', label: 'Microsoft Copilot' },
         { href: '/at-work', label: 'Work gave me the tool' },
@@ -600,7 +612,7 @@ export const startGuide = {
     { href: '/use-cases/tailor-your-cv-to-a-job', label: 'Tailor a CV honestly' },
     { href: '/use-cases/interview-practice-with-ai', label: 'Practise interview answers' },
   ],
-  sources: ['openaiPrompt', 'anthropicPrompt', 'icoAI', 'caHome', 'geminiHome', 'copilotHome', 'hmrcGenuine'],
+  sources: ['openaiPrompt', 'anthropicPrompt', 'icoAI', 'caHome', 'chatgptHome', 'claudeHome', 'geminiHome', 'copilotHome', 'hmrcGenuine'],
 };
 
 export const atWorkGuide = {
@@ -628,7 +640,7 @@ export const atWorkGuide = {
   thirty: [
     'Write the job in one sentence: who it is for, and what “done” looks like.',
     'Pick one real example you are allowed to use. If you are not sure, invent obviously fake details and label them as fake.',
-    'Run one prompt. The three-line email below is enough if your idea is “make this easier to read”.',
+    'Run one prompt. The three-line email above is enough if your idea is “make this easier to read”.',
     'Compare the answer with the original. Mark what is useful and what is wrong.',
     'Write four lines: minutes it took, what you would keep, what you had to fix, what you still do yourself.',
     'If the idea would send, pay, delete or publish anything, stop. Read the permissions guide before you connect it to a real system.',

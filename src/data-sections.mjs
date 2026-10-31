@@ -66,7 +66,7 @@ export const sections = [
     slug: 'use-agents-safely', name: 'Use agents safely', short: 'Use agents safely',
     eyebrow: 'Safety, data and policy',
     headline: 'If AI can take actions, set limits.',
-    intro: 'Plain-English guides for businesses giving AI agents access to email, files and systems: what to allow, what to approve, how to test and how to write it down as a policy your team can follow.',
+    intro: 'Short guides for businesses giving AI agents access to email, files and systems: what to allow, what to approve, how to test and how to write it down as a policy your team can follow.',
   },
 ];
 
@@ -104,7 +104,7 @@ What they told me about their week: """[paste your notes from the conversation]"
 My skills and tools: [e.g. ChatGPT, Zapier, Google Workspace]
 
 1. List the three most repetitive tasks in my notes, and for each say whether a simple prompt, a fixed workflow or nothing at all is the best fit. Be honest if AI isn't worth it.
-2. For the single best task, write a one-page proposal in plain British English: the problem, what I'll set up, what is NOT included, what the client must provide, how a person stays in control of anything sent or paid, and how we'll check it's working after 30 days.
+2. For the single best task, write a one-page proposal in simple, everyday British English: the problem, what I'll set up, what is NOT included, what the client must provide, how a person stays in control of anything sent or paid, and how we'll check it's working after 30 days.
 3. List questions I still need to ask the client.
 Do not invent figures for time saved or money earned. Mark anything that needs the client's numbers as [CLIENT TO CONFIRM].`,
     sources: ['govSelfEmployed', 'govTrading', 'govTradingIncrease', 'icoAI', 'zapier'],
@@ -141,7 +141,7 @@ Who it's for: [e.g. new practice managers]
 
 Step 1: Ask me 10 questions, one at a time, that draw out what I know that a newcomer gets wrong. Wait for each answer.
 Step 2: When I've answered, propose a pack of 3 to 5 items (checklists, templates, a short guide) with a one-line purpose for each.
-Step 3: For the first item, draft it in plain British English, marking with [CHECK] anything I must verify and [MY EXAMPLE] where I should add a real example.
+Step 3: For the first item, draft it in simple, everyday British English, marking with [CHECK] anything I must verify and [MY EXAMPLE] where I should add a real example.
 Step 4: Write an honest product description: who it's for, what's inside, what it won't do. No income, results or time-saving promises.`,
     sources: ['kdp', 'asaMoney', 'govTrading', 'govSelfEmployed'],
   },
@@ -313,7 +313,7 @@ Don't recommend a supplier. This is not legal advice.`,
 """[paste emails]"""
 
 1. Sort each into: REPLY TODAY, DELEGATE (suggest to whom: [list roles]), READ LATER, IGNORE. Give a one-line reason.
-2. For REPLY TODAY messages that are routine, draft a reply under 100 words in a friendly, plain British English tone. Mark anything that needs a fact I must check as [CHECK].
+2. For REPLY TODAY messages that are routine, draft a reply under 100 words in a friendly, simple, everyday British English tone. Mark anything that needs a fact I must check as [CHECK].
 3. List every deadline or request with a date.
 Do not draft replies that agree to payments, contracts or sharing documents: flag those for me instead.`,
     sources: ['owaspAgency', 'icoAI'],
@@ -357,7 +357,7 @@ MY CV (personal contact details removed):
 2. For "partial" items, suggest clearer wording for what I've already written. Don't invent detail; ask me a question instead.
 3. For "missing" items, list them so I can decide whether to apply, and suggest honest ways to address them (for example, related experience I've described).
 4. Suggest a reordered CV outline that puts the most relevant experience first.
-5. Draft a cover letter under 250 words in plain British English, based only on the evidence above. Mark anything I must check as [CHECK].`,
+5. Draft a cover letter under 250 words in simple, everyday British English, based only on the evidence above. Mark anything I must check as [CHECK].`,
     sources: ['ncsCv', 'ncsStar', 'ncsCareers'],
   },
   {
@@ -436,7 +436,7 @@ MY NOTES FOR THE YEAR (confidential names, clients and figures removed):
 3. List objectives with no evidence yet, so I can think of examples.
 4. Suggest two or three development goals as SMART objectives (specific, measurable, achievable, relevant, time-bound).
 5. List questions I could ask my manager in the review.
-Plain British English, first person, no exaggeration.`,
+Simple, everyday British English, first person, no exaggeration.`,
     sources: ['acasPerformance', 'acasAppraisal'],
   },
   {
@@ -479,7 +479,7 @@ PAY INFORMATION I'VE CHECKED (with sources):
 3. Do NOT suggest salary figures yourself. If I haven't given a sourced figure, write [CHECKED FIGURE NEEDED].
 4. Play my manager: raise the three most likely objections, one at a time, and let me answer each.
 5. Suggest a short opening line for the conversation.
-Plain British English. Firm, not confrontational.`,
+Simple, everyday British English. Firm, not confrontational.`,
     sources: ['ncsCareers', 'onsAshe', 'acasEqualPay'],
   },
   {
@@ -539,7 +539,7 @@ Don't tell me what to cancel. List the questions I should answer to decide.`,
       'How the sender’s answers compared with the AI’s explanation, which tells you how far to trust it next time.',
     ],
     evidence: 'No statistics cited. AI explanations can be wrong or miss the detail that matters, which is why this playbook treats the summary as a starting point. HMRC says it will only email you about a tax rebate, or ask for personal or payment information, from an address ending in hmrc.gov.uk, and will never send a tax rebate notification by text.',
-    prompt: `Explain this letter to me in plain British English. I've removed my personal details. This is to help me understand it, not legal, tax or financial advice.
+    prompt: `Explain this letter to me in simple, everyday British English. I've removed my personal details. This is to help me understand it, not legal, tax or financial advice.
 """[paste the letter text]"""
 
 1. In three sentences: who it's from, what it's about and whether it asks me to do anything.
@@ -620,7 +620,7 @@ WHAT I WANT: [describe it in your own words, e.g. "total of column D where colum
 OR EXPLAIN THIS FORMULA: [paste the formula]
 
 1. Give the formula, and say which cell it goes in.
-2. Explain it piece by piece in plain British English.
+2. Explain it piece by piece in simple, everyday British English.
 3. Work out by hand what it should return for my sample rows, so I can compare.
 4. List awkward cases that could break it (blanks, text, duplicates, dates stored as text) and how to handle them.
 5. If a function you use isn't available in my program, say so and give an alternative.`,
@@ -656,7 +656,7 @@ OR EXPLAIN THIS FORMULA: [paste the formula]
 2. Tell me how I could check it independently, without using any link, number or email address in the message.
 3. Tell me which official UK reporting route fits this kind of message.
 4. Don't tell me it's safe. You can't verify who sent it. If it could be genuine, tell me how to find out through official contact details.
-Plain British English, calm and short.`,
+Simple, everyday British English, calm and short.`,
     sources: ['ncscPhishing', 'ncscReportEmail', 'reportFraud', 'caScamCheck', 'stopScams159'],
   },
   {
@@ -691,7 +691,7 @@ MY NOTES:
 1. Organise this into: summary; open items (item | status | next step | deadline | who to ask); regular tasks and when they happen; contacts by role; where documents are kept; decisions still pending.
 2. Flag anything that looks like a password, key or personal detail so I can remove it.
 3. List 10 questions the person covering is likely to ask that my notes don't answer.
-Use only my notes. Mark gaps as [TO ADD]. Plain British English.`,
+Use only my notes. Mark gaps as [TO ADD]. Simple, everyday British English.`,
     sources: ['icoAI'],
   },
 ];
@@ -884,7 +884,7 @@ AI tools we use or plan to use: [list, with what each is for]
 Data we handle: [e.g. customer contact details, payroll, client files]
 Anything regulated: [e.g. FCA-regulated, health data, children's data, or "none"]
 
-1. Rewrite the policy below for my business in plain British English, keeping it to one page.
+1. Rewrite the policy below for my business in simple, everyday British English, keeping it to one page.
 2. Fill in sensible approval rules for each tool I listed.
 3. List any areas where I should get specialist advice (legal, data protection, regulatory) rather than rely on this policy.
 POLICY:

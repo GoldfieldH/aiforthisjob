@@ -83,7 +83,7 @@ const baseUseCases = [
     ],
     evidence: 'In an independent study of 5,179 customer support agents, access to a generative AI assistant raised issues resolved per hour by 14% on average, with the biggest gains for newer staff (NBER Working Paper 31161). Your results will depend on your own volumes and content.',
     prompt: `You are a customer support assistant for [BUSINESS NAME].
-Tone: friendly, plain British English, no jargon, no more than 150 words.
+Tone: friendly, simple, everyday British English, no jargon, no more than 150 words.
 
 Use ONLY the policy and help text below. If the answer is not covered, say so and suggest the customer is passed to a human. Never invent prices, dates or promises.
 
@@ -364,7 +364,7 @@ Screens:
 Data to store: [fields and types]
 Rules: [e.g. only admins can delete]
 
-Constraints: mobile friendly, plain British English labels, no personal data beyond [X], include a README explaining how to run it.
+Constraints: mobile friendly, simple, everyday British English labels, no personal data beyond [X], include a README explaining how to run it.
 Before writing code, list your assumptions and ask me up to 5 questions.`,
     sources: ['lovable', 'v0', 'replit', 'cursor', 'ncsc', 'ghCopilot'],
   },
@@ -437,7 +437,7 @@ Key responsibilities: [list]
 Must-have skills: [max 5]
 Salary: [£ range]  Hours/location: [details]
 
-Use plain British English, avoid jargon and gendered or age-coded language, and keep "must-haves" genuinely essential.
+Use simple, everyday British English, avoid jargon and gendered or age-coded language, and keep "must-haves" genuinely essential.
 Then give 6 structured interview questions linked to the must-haves, each with what a strong answer looks like.`,
     sources: ['icoRec', 'icoAI'],
   },
