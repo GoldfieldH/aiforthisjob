@@ -2,6 +2,7 @@
 // Rule: never invent statistics. Vendor claims are labelled as such.
 import { newSources, newCategories, newUseCases, newGuides, sections as sectionList } from './data-sections.mjs';
 import { pathSources } from './data-paths.mjs';
+import { occupationSources } from './data-occupations.mjs';
 
 export const categories = [
   { slug: 'customer-support', name: 'Customer support', blurb: 'Answer customers faster without losing the human touch.' },
@@ -54,7 +55,7 @@ const S = {
   gresham: { title: 'Gresham (product page)', url: 'https://www.greshamtech.com/', kind: 'Vendor page' },
   fenergo: { title: 'Fenergo (product page)', url: 'https://www.fenergo.com/', kind: 'Vendor page' },
 };
-Object.assign(S, newSources, pathSources);
+Object.assign(S, newSources, pathSources, occupationSources);
 export const sources = S;
 export const sections = sectionList;
 const T_MVP = '2026-10-29T00:14:53Z';

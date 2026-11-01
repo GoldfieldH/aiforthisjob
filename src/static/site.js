@@ -33,20 +33,63 @@ document.querySelectorAll('.copy').forEach((b) => b.addEventListener('click', as
   try { await navigator.clipboard.writeText(code.innerText); b.textContent = 'Copied ✓'; } catch { b.textContent = 'Select and copy'; }
   setTimeout(() => { b.textContent = label; }, 2000);
 }));
-// Filters (ideas by job, and little useful things). Items tagged "both" stay visible in Work and Home.
+// Find a job by name. The links stay in the HTML, so the list works with no JS.
+document.querySelectorAll('[data-job-finder]').forEach((root) => {
+  const input = root.querySelector('[data-job-query]');
+  const items = [...root.querySelectorAll('[data-keywords]')];
+  const empty = root.querySelector('[data-finder-empty]');
+  const status = root.querySelector('[data-finder-status]');
+  const form = root.querySelector('form');
+  if (!input) return;
+  const fromUrl = new URLSearchParams(location.search).get('q');
+  if (fromUrl && !input.value) input.value = fromUrl;
+  const apply = () => {
+    const q = input.value.trim().toLowerCase();
+    let n = 0;
+    items.forEach((el) => {
+      const show = !q || (el.dataset.keywords || '').toLowerCase().includes(q);
+      el.hidden = !show;
+      if (show) n++;
+    });
+    if (empty) empty.hidden = !q || n > 0;
+    if (status) status.textContent = q ? (n === 1 ? '1 job' : `${n} jobs`) : '';
+  };
+  input.addEventListener('input', apply);
+  if (form && location.pathname === '/use-cases') {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const url = new URL(location.href);
+      const q = input.value.trim();
+      if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+      history.replaceState(null, '', url);
+      apply();
+    });
+  }
+  apply();
+});
+// Filters (ideas by industry, and little useful things). Items tagged "both" stay visible in Work and Home.
+// A job search on the same page also narrows the industry cards.
 document.querySelectorAll('.filters[data-filter-for]').forEach((bar) => {
   const grid = document.getElementById(bar.dataset.filterFor);
   if (!grid) return;
+  const apply = () => {
+    const active = bar.querySelector('.chip.active');
+    const f = active ? active.dataset.filter : 'all';
+    const q = (document.querySelector('[data-job-query]')?.value || '').trim().toLowerCase();
+    grid.querySelectorAll('[data-cat],[data-aud]').forEach((card) => {
+      const key = card.dataset.cat || card.dataset.aud;
+      const catOk = f === 'all' || key === f || key === 'both';
+      const qOk = !q || card.textContent.toLowerCase().includes(q);
+      card.style.display = catOk && qOk ? '' : 'none';
+    });
+  };
   bar.querySelectorAll('.chip').forEach((c) => c.addEventListener('click', () => {
     bar.querySelectorAll('.chip').forEach((x) => { x.classList.remove('active'); x.setAttribute('aria-pressed', 'false'); });
     c.classList.add('active'); c.setAttribute('aria-pressed', 'true');
-    const f = c.dataset.filter;
-    grid.querySelectorAll('[data-cat],[data-aud]').forEach((card) => {
-      const key = card.dataset.cat || card.dataset.aud;
-      const show = f === 'all' || key === f || key === 'both';
-      card.style.display = show ? '' : 'none';
-    });
+    apply();
   }));
+  document.querySelectorAll('[data-job-query]').forEach((input) => input.addEventListener('input', apply));
+  apply();
 });
 // ROI calculator
 const roi = document.getElementById('roi');
