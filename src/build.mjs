@@ -77,6 +77,7 @@ const navLinks = [
   ['/start', 'Start here', (p) => p === '/start'],
   ['/use-cases', 'Ideas by job', (p) => p === '/use-cases' || p.startsWith('/use-cases/') || p.startsWith('/jobs/')],
   ['/guides', 'Guides', (p) => p === '/guides' || p.startsWith('/guides/')],
+  ['/learn-more', 'Learn', (p) => p === '/learn-more'],
   ['/packs', 'Packs', (p) => p === '/packs'],
 ];
 
@@ -140,7 +141,7 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <div class="footer-brand"><a class="logo" href="/"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a><p class="muted">Which AI for which job, with honest notes on what it takes and whether it pays back. Written for UK readers.</p></div>
 <div><h2 class="footer-h">Explore</h2><a href="/start">Start here</a><a href="/at-work">AI at work</a><a href="/get-done">What do you want to get done?</a><a href="/little-things">Little useful things</a>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
 <div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
-<div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
+<div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/learn-more">Where to learn about AI</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}. Packs are sold by ${COMPANY}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 ${path === '/packs' ? '' : `<a class="btn buy-fab" href="/packs"><span>Buy packs</span><span class="buy-fab-note">${ONE_OFF}</span></a>`}
 <script src="/site.js" defer></script>
@@ -721,13 +722,281 @@ page({
 <h2>Changes</h2><p>If we change how we use your data, we’ll update this notice and the date at the top.</p></section>`,
 });
 
+// ---------- Where to learn about AI ----------
+// A reading list. Dates are the day the list was added, not the build date.
+const LEARN_ADDED = '2026-11-01T12:00:00Z';
+const LEARN_DESC = 'Channels, podcasts, free courses and newsletters we follow for AI. No affiliate links. We say so when a creator sells a course.';
+const learnLink = (href, label) => `<a href="${esc(href)}" rel="noopener" target="_blank">${esc(label)}</a>`;
+const learnItem = (item) => `<article class="thing" id="${esc(item.id)}">
+<span class="tag">${esc(item.level)}</span>
+<h4>${esc(item.name)}</h4>
+<ul class="inline-links">${item.links.map(([href, label]) => `<li>${learnLink(href, label)}</li>`).join('')}</ul>
+<p>${esc(item.text)}</p>
+</article>`;
+const learnGroup = (group) => `<h3 id="${esc(group.id)}">${esc(group.title)}</h3><div class="stack learn-list">${group.items.map(learnItem).join('')}</div>`;
+const learnSections = [
+  {
+    id: 'what-we-follow',
+    title: 'What we follow',
+    intro: 'These are the ones we actually watch and listen to. We will change the list when that changes.',
+    groups: [
+      {
+        id: 'follow-youtube',
+        title: 'YouTube',
+        items: [
+          {
+            id: 'alex-finn',
+            name: 'Alex Finn',
+            level: 'Intermediate',
+            links: [['https://www.youtube.com/@AlexFinnOfficial', 'youtube.com/@AlexFinnOfficial']],
+            text: 'He builds apps and tools with AI without being a coder. He calls that vibe coding, and he also covers AI news. The videos are hands-on and they move fast. He promotes a paid course, Vibe Coding Academy.',
+          },
+          {
+            id: 'nate-herk',
+            name: 'Nate Herk',
+            level: 'Intermediate',
+            links: [['https://www.youtube.com/@nateherk', 'youtube.com/@nateherk']],
+            text: 'Step-by-step videos on getting AI to do a real job: automations, agents, n8n and Claude Code, explained for people who do not write code. He runs a paid community, AI Automation Society.',
+          },
+        ],
+      },
+      {
+        id: 'follow-podcasts',
+        title: 'Podcasts',
+        items: [
+          {
+            id: 'lex-fridman',
+            name: 'Lex Fridman Podcast',
+            level: 'Intermediate',
+            links: [
+              ['https://lexfridman.com/podcast/', 'lexfridman.com/podcast'],
+              ['https://open.spotify.com/show/2MAi0BvDc6GTFvKFPXnkCL', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/lex-fridman-podcast/id1434243584', 'Apple Podcasts'],
+            ],
+            text: 'Long-form interviews, often two to four hours, with AI researchers, founders and other guests. A wide-ranging conversation. This is not a business-only show, and it is not a list of tips.',
+          },
+          {
+            id: 'ai-daily-brief',
+            name: 'The AI Daily Brief',
+            level: 'Novice-Intermediate',
+            links: [
+              ['https://aidailybrief.ai/', 'aidailybrief.ai'],
+              ['https://open.spotify.com/show/7gKwwMLFLc6RmjmRpbMtEO', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/the-ai-daily-brief-artificial-intelligence-news/id1680633614', 'Apple Podcasts'],
+            ],
+            text: 'Nathaniel Whittemore’s daily briefing on AI news and what it might mean. Much shorter than an interview show. Episodes often include sponsors, and the show says so.',
+          },
+          {
+            id: 'ai-in-business',
+            name: 'The AI in Business Podcast',
+            level: 'Intermediate',
+            links: [
+              ['https://podcast.emerj.com/aiinbusiness', 'podcast.emerj.com'],
+              ['https://open.spotify.com/show/4gD9xiYU9iC24vnjUx1PTg', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/the-ai-in-business-podcast/id670771965', 'Apple Podcasts'],
+            ],
+            text: 'From Emerj, created by Daniel Faggella. Interviews with people at large companies about AI projects they have run, and what came back. Many episodes are sponsored, and the show says so.',
+          },
+          {
+            id: 'ai-chat',
+            name: 'AI Chat',
+            level: 'Novice',
+            links: [
+              ['https://www.aichatdaily.com/podcast/ai-chat', 'aichatdaily.com'],
+              ['https://open.spotify.com/show/0FMz3FsApINUKszziRKDKa', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/ai-chat-ai-news-on-claude-chatgpt-gemini-grok-perplexity/id1669990482', 'Apple Podcasts'],
+            ],
+            text: 'Jaeden Schafer’s short daily rundown of the main AI news. Easy to keep up with in a gap in the day.',
+          },
+          {
+            id: 'ai-hustle',
+            name: 'AI Hustle: Make Money with AI',
+            level: 'Novice',
+            links: [
+              ['https://www.aichatdaily.com/podcast/ai-hustle', 'aichatdaily.com'],
+              ['https://open.spotify.com/show/03rUZh8TQ1203GqAmzXJN1', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/ai-hustle-make-money-with-ai/id1670018916', 'Apple Podcasts'],
+            ],
+            text: 'Jaeden Schafer and Jamie McCauley, in short episodes, on side businesses and on using AI in a small business. If the hosts mention earnings, that is their claim. We have not checked it, and this site does not promise an income.',
+          },
+          {
+            id: 'ai-applied',
+            name: 'AI Applied',
+            level: 'Novice-Intermediate',
+            links: [
+              ['https://www.aichatdaily.com/podcast/ai-applied', 'aichatdaily.com'],
+              ['https://open.spotify.com/show/5pPL7tdz2HO7SowtSMqvQw', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/ai-applied-covering-ai-news-interviews-and-tools/id1669799110', 'Apple Podcasts'],
+            ],
+            text: 'Jaeden Schafer and Conor Grennan on what the week’s tools and news mean for someone using AI at work. Conor Grennan teaches this, and you can hear that in the episodes.',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'worth-your-time',
+    title: 'Also worth your time',
+    intro: 'Easier places to start if you want one video, one course or a newsletter, rather than a daily feed.',
+    groups: [
+      {
+        id: 'worth-youtube',
+        title: 'Videos to start with',
+        items: [
+          {
+            id: 'neural-network',
+            name: 'But what is a neural network?',
+            level: 'Novice-Intermediate',
+            links: [
+              ['https://www.youtube.com/watch?v=aircAruvnKk', 'Watch the video'],
+              ['https://www.youtube.com/watch?v=wjZofJX0v4M', 'Follow-up: Transformers, the tech behind LLMs'],
+            ],
+            text: '3Blue1Brown. A clear picture of how a neural network learns. The second link is the follow-up on transformers, the method behind tools such as ChatGPT.',
+          },
+          {
+            id: 'karpathy-llm',
+            name: 'Intro to Large Language Models',
+            level: 'Intermediate',
+            links: [['https://www.youtube.com/watch?v=zjkBMFhNj_g', 'Watch the video (about an hour)']],
+            text: 'Andrej Karpathy, one of the people who built this kind of tool. How ChatGPT-style tools work, told calmly and with less jargon than most talks at this depth. It went up in 2023, and it is still a clear explainer.',
+          },
+          {
+            id: 'jeff-su',
+            name: 'Jeff Su',
+            level: 'Novice',
+            links: [['https://www.youtube.com/@JeffSu', 'youtube.com/@JeffSu']],
+            text: 'Short videos on using AI, and Google and Microsoft tools, to get office work done faster.',
+          },
+          {
+            id: 'kevin-stratvert',
+            name: 'Kevin Stratvert',
+            level: 'Novice',
+            links: [['https://www.youtube.com/@KevinStratvert', 'youtube.com/@KevinStratvert']],
+            text: 'Patient, click-by-click tutorials, including Copilot and ChatGPT. A good fit if work has given you Microsoft’s tools and you want to see each click.',
+          },
+        ],
+      },
+      {
+        id: 'worth-podcasts',
+        title: 'A podcast to start with',
+        items: [
+          {
+            id: 'ai-show',
+            name: 'The Artificial Intelligence Show',
+            level: 'Novice-Intermediate',
+            links: [
+              ['https://podcast.smarterx.ai/', 'podcast.smarterx.ai'],
+              ['https://open.spotify.com/show/6EVaCucTjIPmJosh3jQui0', 'Spotify'],
+              ['https://podcasts.apple.com/us/podcast/the-artificial-intelligence-show/id1548733275', 'Apple Podcasts'],
+            ],
+            text: 'Paul Roetzer and Mike Kaput, weekly, on what the AI news means for a business and a career, in everyday language. They also sell courses, through AI Academy.',
+          },
+        ],
+      },
+      {
+        id: 'free-courses',
+        title: 'Free courses',
+        items: [
+          {
+            id: 'elements-of-ai',
+            name: 'Elements of AI',
+            level: 'Novice',
+            links: [['https://www.elementsofai.com/', 'elementsofai.com']],
+            text: 'From the University of Helsinki. A free, self-paced introduction to what AI is and what it is not. It is not tied to one company.',
+          },
+          {
+            id: 'google-ai-essentials',
+            name: 'Google AI Essentials',
+            level: 'Novice',
+            links: [['https://grow.google/ai-essentials/', 'grow.google/ai-essentials']],
+            text: 'A short beginner course on writing prompts and using AI carefully at work. The certificate route is paid, through Coursera.',
+          },
+        ],
+      },
+      {
+        id: 'newsletters',
+        title: 'Newsletters and news',
+        items: [
+          {
+            id: 'one-useful-thing',
+            name: 'One Useful Thing',
+            level: 'Intermediate',
+            links: [['https://www.oneusefulthing.org/', 'oneusefulthing.org']],
+            text: 'Ethan Mollick, who teaches at Wharton, writes essays on using AI at work. He shows the evidence he is using. Free to read.',
+          },
+          {
+            id: 'rundown',
+            name: 'The Rundown AI',
+            level: 'Novice',
+            links: [['https://www.therundown.ai/', 'therundown.ai']],
+            text: 'A daily email of AI news and tools, written to be a quick read. Free, with ads and a paid tier.',
+          },
+          {
+            id: 'ieee-spectrum',
+            name: 'IEEE Spectrum: AI',
+            level: 'Intermediate',
+            links: [['https://spectrum.ieee.org/topic/artificial-intelligence/', 'spectrum.ieee.org']],
+            text: 'AI news from IEEE Spectrum. IEEE is a worldwide engineering body, so this is not one country’s news service. Some articles expect you to want the technical detail.',
+          },
+          {
+            id: 'mit-tech-review',
+            name: 'MIT Technology Review: AI',
+            level: 'Intermediate',
+            links: [['https://www.technologyreview.com/topic/artificial-intelligence/', 'technologyreview.com']],
+            text: 'Reported pieces on where AI is heading. Slower than a daily email. Some articles are behind a paywall.',
+          },
+        ],
+      },
+    ],
+  },
+];
+const learnCitations = learnSections.flatMap((section) => section.groups.flatMap((group) => group.items.flatMap((item) => item.links.map(([href]) => href))));
+page({
+  path: '/learn-more',
+  title: 'Where to learn about AI',
+  description: LEARN_DESC,
+  type: 'article',
+  progress: true,
+  lastmod: LEARN_ADDED,
+  published: LEARN_ADDED,
+  modified: LEARN_ADDED,
+  jsonld: [
+    crumbsLd([['Home', '/'], ['Where to learn about AI', '/learn-more']]),
+    articleLd({
+      headline: 'Where to learn about AI',
+      description: LEARN_DESC,
+      path: '/learn-more',
+      added: LEARN_ADDED,
+      extra: { citation: learnCitations },
+    }),
+  ],
+  body: `<header class="article-hero"><div class="wrap narrow">${crumbsHtml([['Home', '/'], ['Where to learn about AI', '/learn-more']])}
+<h1 class="display-s">Where to learn about AI</h1>
+<p class="lede">A reading list of what we follow, plus a few places that are easier if you are just starting. If you would rather try one small job than open another channel, <a href="/start">start&nbsp;here</a>. That page takes about five minutes.</p>
+<p class="meta muted small">By the ${NAME} team · Added <time datetime="${LEARN_ADDED}">${niceDate(LEARN_ADDED)}</time> · Links checked the same day</p>
+</div></header>
+<div class="wrap narrow"><article class="article">
+<div class="callout"><strong>No affiliate links.</strong> Nobody pays us to be on this list. Some of these people sell a course or a community. We say so on that entry. You can skip every paid offer and still use the free videos, shows and essays. Our <a href="/disclosure">sponsor and affiliate disclosure</a> says the same for the rest of the site.</div>
+<p><strong>Novice</strong> means you can follow it without already knowing how these tools work. <strong>Intermediate</strong> means it helps if you have used a chat tool for a few weeks. <strong>Novice-Intermediate</strong> sits between the two.</p>
+<ul class="jump">
+<li><a href="#what-we-follow">What we follow</a></li>
+<li><a href="#worth-youtube">Videos to start with</a></li>
+<li><a href="#worth-podcasts">A podcast to start with</a></li>
+<li><a href="#free-courses">Free courses</a></li>
+<li><a href="#newsletters">Newsletters and news</a></li>
+</ul>
+${learnSections.map((section) => `<h2 id="${esc(section.id)}">${esc(section.title)}</h2><p>${esc(section.intro)}</p>${section.groups.map(learnGroup).join('')}`).join('')}
+<p>When you want a job to try, <a href="/start">start here</a>.</p>
+</article></div>`,
+});
+
 // ---------- 404 ----------
 // Full site chrome so visitors can carry on; always noindex and never in the sitemap.
 page({
   path: '/404', file: '404.html', noindex: true, sitemap: false, title: 'Page not found',
   description: 'That page doesn’t exist. Browse the AI use-case library or start from the home page.',
   body: `<section class="wrap narrow section"><p class="eyebrow">404</p><h1 class="display-s">Page not found</h1><p class="lede">That page doesn’t exist (yet).</p>
-<ul><li><a href="/start">Start here</a></li><li><a href="/at-work">AI at work</a></li><li><a href="/get-done">What do you want to get done?</a></li><li><a href="/use-cases">Ideas by job</a></li>${sections.map((x) => `<li><a href="/${x.slug}">${esc(x.name)}</a></li>`).join('')}<li><a href="/guides">Guides</a></li><li><a href="/">Home</a></li></ul>
+<ul><li><a href="/start">Start here</a></li><li><a href="/at-work">AI at work</a></li><li><a href="/get-done">What do you want to get done?</a></li><li><a href="/use-cases">Ideas by job</a></li>${sections.map((x) => `<li><a href="/${x.slug}">${esc(x.name)}</a></li>`).join('')}<li><a href="/guides">Guides</a></li><li><a href="/learn-more">Where to learn about AI</a></li><li><a href="/">Home</a></li></ul>
 <p class="muted">If you followed a link here from our site, please tell us: ${SUPPORT}.</p></section>`,
 });
 
@@ -787,6 +1056,7 @@ ${guides.map((g) => `- [${g.title}](${SITE}/guides/${g.slug}): ${g.summary}`).jo
 - [Prompt and agent-config packs](${SITE}/packs): paid, ready-to-use kits for specific jobs.
 
 ## Optional
+- [Where to learn about AI](${SITE}/learn-more): channels, podcasts, free courses and newsletters we follow. No affiliate links.
 - [RSS feed](${SITE}/feed.xml)
 - [About](${SITE}/about)
 - [Sponsor and affiliate disclosure](${SITE}/disclosure)

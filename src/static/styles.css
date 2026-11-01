@@ -137,6 +137,11 @@ html:has(.buy-fab){scroll-padding-bottom:calc(92px + env(safe-area-inset-bottom,
 .stack{display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
 .thing{min-width:0;scroll-margin-top:calc(var(--nav-h) + 18px);background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:36px 0 8px;box-shadow:none}
 .thing h2{margin-top:12px}
+/* /learn-more: same hairline stack as little things. No card, no shadow. */
+.learn-list .thing:first-child{border-top:0;padding-top:8px}
+.learn-list h4{font-size:1.18rem;margin:12px 0 .35em;letter-spacing:-.02em;line-height:1.25;font-weight:700;text-wrap:balance}
+.learn-list .inline-links{margin:.2em 0 .6em}
+.learn-list .inline-links a{overflow-wrap:anywhere}
 .want-more h2{margin-top:0}
 .trust{display:flex;gap:10px 26px;justify-content:center;flex-wrap:wrap;list-style:none;padding:0;margin:0;color:var(--muted);font-size:.92rem}
 .trust li:before{content:"✓";color:var(--ok);font-weight:700;margin-right:6px}
