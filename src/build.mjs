@@ -3,8 +3,10 @@ import { dirname, join } from 'node:path';
 import { categories, useCases, guides, sources, sections } from './data.mjs';
 import { packs as catalogue, SUPPORT_EMAIL } from '../lib/packs.mjs';
 import { ADDED, goals, littleThings, startGuide, atWorkGuide, goalPrompt, goalGood, requirePaths } from './data-paths.mjs';
+import { occupations, OCCUPATION_ADDED, requireOccupations } from './data-occupations.mjs';
 
 requirePaths(sources);
+requireOccupations(sources);
 
 const SITE = (process.env.SITE_URL || 'https://www.aiforthisjob.com').replace(/\/$/, ''); // canonical host (apex 308-redirects to www)
 // On Vercel, launch mode is only Production. VERCEL_ENV is set by the platform
@@ -140,8 +142,8 @@ ${PREVIEW ? '<div class="preview-bar">Preview version: not yet launched. Content
 <main id="main">${body}</main>
 <footer class="site-footer"><div class="wrap footer-grid">
 <div class="footer-brand"><a class="logo" href="/"><span class="logo-mark" aria-hidden="true">AI</span><span>ForThisJob</span></a><p class="muted">Which AI for which job, with honest notes on what it takes and whether it pays back. Written for UK readers.</p></div>
-<div><h2 class="footer-h">Explore</h2><a href="/start">Start here</a><a href="/at-work">AI at work</a><a href="/get-done">What do you want to get done?</a><a href="/little-things">Little useful things</a>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
-<div><h2 class="footer-h">By job</h2>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
+<div><h2 class="footer-h">Explore</h2><a href="/start">Start here</a><a href="/at-work">AI at work</a><a href="/use-cases#your-job">Find your job</a><a href="/get-done">What do you want to get done?</a><a href="/little-things">Little useful things</a>${sections.map((s) => `<a href="/${s.slug}">${esc(s.name)}</a>`).join('')}<a href="/use-cases">All use cases</a><a href="/latest">Latest</a><a href="/roi-calculator">ROI calculator</a></div>
+<div><h2 class="footer-h">By job</h2>${occupations.map((j) => `<a href="/jobs/${j.slug}">${esc(j.name)}</a>`).join('')}<p class="footer-label">By industry</p>${categories.map((c) => `<a href="/jobs/${c.slug}">${esc(c.name)}</a>`).join('')}</div>
 <div><h2 class="footer-h">About</h2><a href="/about">About</a><a href="/guides">Guides</a><a href="/learn-more">Where to learn about AI</a><a href="/packs">Packs</a><a href="/newsletter">Newsletter</a><a href="/feed.xml">RSS feed</a><a href="/disclosure">Sponsor and affiliate disclosure</a><a href="/terms">Terms</a><a href="/privacy">Privacy</a><a href="mailto:${SUPPORT_EMAIL}">Contact</a></div>
 </div><div class="wrap fine">© ${new Date().getFullYear()} ${COMPANY}. ${NAME} is run by ${COMPANY}. Packs are sold by ${COMPANY}. Information only, not financial, legal or professional advice. Product names belong to their owners; no endorsement implied.</div></footer>
 ${path === '/packs' ? '' : `<a class="btn buy-fab" href="/packs"><span>Buy packs</span><span class="buy-fab-note">${ONE_OFF}</span></a>`}
@@ -202,6 +204,15 @@ const goalPicker = () => {
   }).join('')}</div>`;
 };
 const audLabel = { work: 'At work', home: 'At home', both: 'Work or home', either: 'Not sure' };
+const jobFinder = (id) => `<div data-job-finder>
+<form class="job-finder" role="search" action="/use-cases" method="get">
+<label for="${id}">Find your job</label>
+<input id="${id}" name="q" type="search" data-job-query placeholder="Nurse, plumber, teacher, sales" autocomplete="off" enterkeyhint="search">
+</form>
+<p class="finder-status muted small" data-finder-status role="status" aria-live="polite"></p>
+<p class="finder-empty" data-finder-empty hidden>No page for that job yet. Try a title such as plumber, teacher or nurse, or browse the industry list.</p>
+<div class="job-picks">${occupations.map((j) => `<a class="choice" href="/jobs/${j.slug}" data-keywords="${esc([j.name, j.h1, j.title, j.card, ...j.keywords].join(' '))}"><strong>${esc(j.name)}</strong><span>${esc(j.card)}</span></a>`).join('')}</div>
+</div>`;
 
 const moneyDisclaimer = `<div class="callout warn disclaimer" role="note"><strong>No income promises.</strong> ${esc(secBy['make-money-with-ai'].disclaimer)}</div>`;
 
@@ -209,6 +220,7 @@ const moneyDisclaimer = `<div class="callout warn disclaimer" role="note"><stron
 const entries = [
   ...useCases.map((u, i) => ({ kind: 'Use case', path: `/use-cases/${u.slug}`, title: u.title, summary: u.summary, added: u.added, section: u.section, cat: catBy[u.cat].name, order: i })),
   ...guides.map((g, i) => ({ kind: 'Guide', path: `/guides/${g.slug}`, title: g.title, summary: g.summary, added: g.added, section: g.section, cat: g.section ? secBy[g.section].name : 'Guide', order: 100 + i })),
+  ...occupations.map((j, i) => ({ kind: 'Job', path: `/jobs/${j.slug}`, title: j.h1, summary: j.description, added: OCCUPATION_ADDED, section: null, cat: j.name, order: 200 + i })),
 ].sort((a, b) => b.added.localeCompare(a.added) || b.order - a.order);
 
 // ---------- Home ----------
@@ -227,7 +239,7 @@ const sectionExamples = {
 };
 const panelTone = { 'make-money-with-ai': 'band-light', 'save-time-and-money': 'band-soft', 'use-agents-safely': 'band-dark' };
 page({
-  path: '/', title: 'AI use cases by job, with prompts and ROI | AIForThisJob', lastmod: latestOf([...useCases, ...guides, { added: ADDED }]),
+  path: '/', title: 'AI use cases by job, with prompts and ROI | AIForThisJob', lastmod: latestOf([...useCases, ...guides, { added: ADDED }, { added: OCCUPATION_ADDED }]),
   description: 'You’ve got the AI tools. Now what? A first page if you’re new, a first week if work just switched a tool on, and ideas for the job you do.',
   jsonld: [orgLd, siteLd], bodyClass: 'home',
   body: `
@@ -258,10 +270,13 @@ ${sections.map((s, i) => `<section class="panel ${panelTone[s.slug]}" aria-label
 <ul class="panel-list">${sectionExamples[s.slug].map(([h, t]) => `<li><a href="${h}">${esc(t)}</a></li>`).join('')}</ul>
 </div></section>`).join('\n')}
 </div>
+<section class="wrap section" id="your-job"><div class="section-head reveal"><h2>The job you do</h2><a href="/use-cases#your-job">Search jobs</a></div>
+<p class="lede">Eight jobs to start with. Each page has prompts you can copy, the level of the task, and a note on what to leave to a qualified person.</p>
+${jobFinder('home-job-q')}</section>
 <section class="wrap section"><div class="section-head reveal"><h2>Browse by job or industry</h2><a href="/use-cases">See all ${useCases.length} ideas</a></div>
 <div class="grid cats">${categories.map((c, i) => { const n = useCases.filter((u) => u.cat === c.slug).length; const count = n < 3 ? 'A few ideas' : `${n} ideas`; return `<a class="cat reveal" style="--i:${i % 6}" href="/jobs/${c.slug}"><h3>${esc(c.name)}</h3><p>${esc(c.blurb)}</p><span class="count">${count}</span></a>`; }).join('')}</div></section>
 <section class="band-soft"><div class="wrap section"><div class="section-head reveal"><h2>Just added</h2><a href="/latest">Everything new</a></div>
-<div class="grid">${entries.slice(0, 6).map((e, i) => `<a class="card reveal" style="--i:${i}" href="${e.path}"><span class="tag">${esc(e.cat)}</span><h3>${esc(e.title)}</h3><p>${esc(e.summary)}</p><span class="more">${e.kind === 'Guide' ? 'Read the guide' : 'See how'}</span></a>`).join('')}</div></div></section>
+<div class="grid">${entries.slice(0, 6).map((e, i) => `<a class="card reveal" style="--i:${i}" href="${e.path}"><span class="tag">${esc(e.cat)}</span><h3>${esc(e.title)}</h3><p>${esc(e.summary)}</p><span class="more">${e.kind === 'Guide' ? 'Read the guide' : e.kind === 'Job' ? 'See the prompts' : 'See how'}</span></a>`).join('')}</div></div></section>
 <section class="wrap section"><div class="section-head reveal"><h2>Popular ideas</h2></div><div class="grid">${['draft-customer-email-replies', 'automate-repetitive-workflows', 'vibe-code-an-internal-tool', 'spreadsheet-formulas-with-ai', 'meeting-notes-and-actions', 'repurpose-content-into-social-posts'].map((s, i) => card(useCases.find((u) => u.slug === s), i)).join('')}</div></section>
 <section class="wrap section"><div class="section-head reveal"><h2>Short guides if the words still feel fuzzy</h2><a href="/guides">All guides</a></div><div class="grid">${guides.filter((g) => !g.section).map(guideCard).join('')}</div></section>
 ${signup('home-signup')}`,
@@ -313,7 +328,7 @@ page({
   description: 'The newest additions to the AIForThisJob library, newest first. Also available as an RSS feed.',
   jsonld: [crumbsLd([['Home', '/'], ['Latest', '/latest']]), { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Latest additions', itemListOrder: 'https://schema.org/ItemListOrderDescending', itemListElement: entries.map((e, i) => ({ '@type': 'ListItem', position: i + 1, url: SITE + e.path, name: e.title })) }],
   body: `<section class="wrap narrow section">${crumbsHtml([['Home', '/'], ['Latest', '/latest']])}
-<p class="eyebrow">What’s new</p><h1 class="display-s">Latest additions</h1><p class="lede">Every new use case and guide, newest first. Follow along with the <a href="/feed.xml">RSS feed</a> or <a href="/newsletter">the newsletter</a>.</p>
+<p class="eyebrow">What’s new</p><h1 class="display-s">Latest additions</h1><p class="lede">Every new use case, job page and guide, newest first. Follow along with the <a href="/feed.xml">RSS feed</a> or <a href="/newsletter">the newsletter</a>.</p>
 <ol class="timeline">${entries.map((e) => `<li class="reveal"><time datetime="${e.added}">${niceDate(e.added)}</time><a href="${e.path}"><span class="tag">${esc(e.kind)} · ${esc(e.cat)}</span><strong>${esc(e.title)}</strong><span class="muted">${esc(e.summary)}</span></a></li>`).join('')}</ol>
 </section>${signup('latest-signup')}`,
 });
@@ -325,7 +340,10 @@ page({
   jsonld: [crumbsLd([['Home', '/'], ['Use cases', '/use-cases']]), { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: useCases.map((u, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE}/use-cases/${u.slug}`, name: u.title })) }],
   body: `<section class="wrap section">${crumbsHtml([['Home', '/'], ['Use cases', '/use-cases']])}
 <p class="eyebrow">The library</p><h1 class="display-s">Ideas by job</h1><p class="lede">Each idea follows the same shape: the job, how AI helps, what you need first, a prompt to copy, and how to tell if it’s worth it. Sources stay at the bottom.</p>
-<div class="filters" data-filter-for="uc-grid" role="group" aria-label="Filter by job"><button class="chip active" type="button" aria-pressed="true" data-filter="all">All</button>${categories.map((c) => `<button class="chip" type="button" aria-pressed="false" data-filter="${c.slug}">${esc(c.name)}</button>`).join('')}</div>
+<h2 id="your-job">The job you do</h2>
+<p>If your work is one of these, start there. The ideas further down are grouped by industry.</p>
+${jobFinder('uc-job-q')}
+<div class="filters" data-filter-for="uc-grid" role="group" aria-label="Filter by industry"><button class="chip active" type="button" aria-pressed="true" data-filter="all">All</button>${categories.map((c) => `<button class="chip" type="button" aria-pressed="false" data-filter="${c.slug}">${esc(c.name)}</button>`).join('')}</div>
 <div class="grid" id="uc-grid">${useCases.map((u, i) => card(u, i).replace('<a class="card', `<a data-cat="${u.cat}" class="card`)).join('')}</div></section>${signup('lib-signup')}`,
 });
 
@@ -341,6 +359,55 @@ for (const c of categories) {
 ${c.slug === 'side-income' ? moneyDisclaimer : ''}
 <div class="grid">${list.map(card).join('')}</div>
 <p class="muted">More ${esc(lcName(c.name))} use cases are on the way. <a href="/newsletter">Get them by email</a>.</p></section>`,
+  });
+}
+
+// ---------- Occupation pages ("AI for [job]") ----------
+for (const job of occupations) {
+  const crumbs = [['Home', '/'], ['Ideas by job', '/use-cases'], [job.name, `/jobs/${job.slug}`]];
+  const safety = job.safety
+    ? `<div class="callout warn" role="note"><strong>${esc(job.safetyTitle || 'Read this first')}</strong><ul>${job.safety.map((line) => `<li>${esc(line)}</li>`).join('')}</ul></div>`
+    : `<div class="callout"><strong>Read the limit before you paste anything.</strong> <a href="#limits">What not to use AI for</a> is on this page. A draft is not a decision.</div>`;
+  const jumps = `<ul class="jump">${job.tasks.map((task) => `<li><a href="#${task.slug}">${esc(task.title)}</a></li>`).join('')}<li><a href="#limits">What not to use it for</a></li><li><a href="#sources">Sources</a></li></ul>`;
+  const tasks = job.tasks.map((task) => `<article class="thing" id="${task.slug}">
+<span class="tag">${esc(task.level)}</span>
+<h2>${esc(task.title)}</h2>
+<p>${esc(task.why)}</p>
+${promptBlock(task.prompt, 'Prompt', `${task.slug}-prompt`)}
+</article>`).join('');
+  const others = occupations.filter((item) => item.slug !== job.slug);
+  page({
+    path: `/jobs/${job.slug}`, title: job.title, description: job.description, type: 'article', progress: true,
+    lastmod: OCCUPATION_ADDED, published: OCCUPATION_ADDED, modified: OCCUPATION_ADDED,
+    jsonld: [
+      crumbsLd(crumbs),
+      articleLd({ headline: job.h1, description: job.description, path: `/jobs/${job.slug}`, added: OCCUPATION_ADDED,
+        extra: { about: job.name, citation: job.sources.map((k) => sources[k].url) } }),
+      { '@context': 'https://schema.org', '@type': 'ItemList', name: `${job.h1}: tasks`, itemListElement: job.tasks.map((task, i) => ({ '@type': 'ListItem', position: i + 1, name: task.title, url: `${SITE}/jobs/${job.slug}#${task.slug}` })) },
+    ],
+    body: `<header class="article-hero"><div class="wrap narrow">${crumbsHtml(crumbs)}
+<h1 class="display-s">${esc(job.h1)}</h1>
+<p class="lede">${esc(job.lede)}</p>
+<p class="meta muted small">Added <time datetime="${OCCUPATION_ADDED}">${niceDate(OCCUPATION_ADDED)}</time> · <a href="#${job.tasks[0].slug}">Jump to the tasks</a></p>
+</div></header>
+<div class="wrap narrow"><article class="article">
+${safety}
+<p class="level-key"><strong>Novice</strong> means you can try the task the first time you use a chat tool. <strong>Intermediate</strong> means you can already edit a draft. <strong>Professional</strong> means you know this part of the job well enough to catch a wrong one. The level is about the task, not a rank.</p>
+${jumps}
+<h2 id="where">Where it helps</h2>
+<p>${esc(job.note)}</p>
+<h2 id="tasks">Tasks</h2>
+<div class="stack">${tasks}</div>
+<h2 id="limits">${esc(job.limitsTitle)}</h2>
+<ul>${job.limits.map((line) => `<li>${esc(line)}</li>`).join('')}</ul>
+<p>${esc(job.check)}</p>
+${wantMore}
+<h2 id="sources">Sources</h2>
+${sourceList(job.sources)}
+<p class="muted small">Checked <time datetime="${OCCUPATION_ADDED}">${niceDate(OCCUPATION_ADDED)}</time>. These links are the pages we read. They are not a substitute for the rules where you work. Spotted something out of date? Email ${SUPPORT}.</p>
+<h2 id="other-jobs">Other jobs</h2>
+<ul class="inline-links">${others.map((item) => `<li><a href="/jobs/${item.slug}">${esc(item.h1)}</a></li>`).join('')}</ul>
+</article></div>${signup('job-signup')}`,
   });
 }
 
@@ -997,7 +1064,7 @@ page({
   path: '/404', file: '404.html', noindex: true, sitemap: false, title: 'Page not found',
   description: 'That page doesn’t exist. Browse the AI use-case library or start from the home page.',
   body: `<section class="wrap narrow section"><p class="eyebrow">404</p><h1 class="display-s">Page not found</h1><p class="lede">That page doesn’t exist (yet).</p>
-<ul><li><a href="/start">Start here</a></li><li><a href="/at-work">AI at work</a></li><li><a href="/get-done">What do you want to get done?</a></li><li><a href="/use-cases">Ideas by job</a></li>${sections.map((x) => `<li><a href="/${x.slug}">${esc(x.name)}</a></li>`).join('')}<li><a href="/guides">Guides</a></li><li><a href="/learn-more">Where to learn about AI</a></li><li><a href="/">Home</a></li></ul>
+<ul><li><a href="/start">Start here</a></li><li><a href="/at-work">AI at work</a></li><li><a href="/get-done">What do you want to get done?</a></li><li><a href="/use-cases#your-job">Find your job</a></li><li><a href="/use-cases">Ideas by job</a></li>${sections.map((x) => `<li><a href="/${x.slug}">${esc(x.name)}</a></li>`).join('')}<li><a href="/guides">Guides</a></li><li><a href="/learn-more">Where to learn about AI</a></li><li><a href="/">Home</a></li></ul>
 <p class="muted">If you followed a link here from our site, please tell us: ${SUPPORT}.</p></section>`,
 });
 
@@ -1043,6 +1110,9 @@ ${sections.map((x) => `- [${x.name}](${SITE}/${x.slug}): ${x.intro}`).join('\n')
 - [Latest additions](${SITE}/latest): every new use case and guide, newest first. RSS: ${SITE}/feed.xml
 
 Note on "Make money with AI": entries describe effort, start-up cost and rules (HMRC, ASA). They make no income promises and contain no earnings figures.
+
+## Jobs
+${occupations.map((j) => `- [${j.h1}](${SITE}/jobs/${j.slug}): ${j.description}`).join('\n')}
 
 ## Use cases
 ${useCases.map((u) => `- [${u.title}](${SITE}/use-cases/${u.slug}): ${u.summary}`).join('\n')}
