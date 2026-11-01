@@ -117,6 +117,7 @@ ${unlisted ? '' : `<link rel="canonical" href="${url}">\n`}<meta name="robots" c
 <meta property="og:image:height" content="${OG_IMAGE.height}">
 <meta property="og:image:alt" content="${esc(OG_IMAGE.alt)}">
 ${published ? `<meta property="article:published_time" content="${published}">\n<meta property="article:modified_time" content="${modified || published}">\n` : ''}<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@AiForThisJob">
 <meta name="twitter:title" content="${esc(fullTitle)}">
 <meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${SITE}${OG_IMAGE.url}">
@@ -211,7 +212,7 @@ const entries = [
 ].sort((a, b) => b.added.localeCompare(a.added) || b.order - a.order);
 
 // ---------- Home ----------
-const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORG_ID, name: NAME, url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/logo.png', width: 512, height: 512 }, email: SUPPORT_EMAIL, description: 'Practical, realistic AI use cases organised by job and industry: what to try, what to keep a human on and how to tell it pays back.', parentOrganization: { '@type': 'Organization', name: COMPANY }, areaServed: 'GB', contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: SUPPORT_EMAIL, availableLanguage: 'en-GB' } };
+const orgLd = { '@context': 'https://schema.org', '@type': 'Organization', '@id': ORG_ID, name: NAME, url: SITE + '/', logo: { '@type': 'ImageObject', url: SITE + '/logo.png', width: 512, height: 512 }, email: SUPPORT_EMAIL, description: 'Practical, realistic AI use cases organised by job and industry: what to try, what to keep a human on and how to tell it pays back.', sameAs: ['https://x.com/AiForThisJob', 'https://www.linkedin.com/company/aiforthisjob'], parentOrganization: { '@type': 'Organization', name: COMPANY }, areaServed: 'GB', contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: SUPPORT_EMAIL, availableLanguage: 'en-GB' } };
 const siteLd = { '@context': 'https://schema.org', '@type': 'WebSite', '@id': WEBSITE_ID, name: NAME, url: SITE + '/', inLanguage: 'en-GB', description: 'You’ve got the AI tools. Now what? A free library of practical AI use cases organised by job and industry.', publisher: { '@id': ORG_ID } };
 const orgRef = { '@type': 'Organization', '@id': ORG_ID, name: NAME, url: SITE + '/' };
 const articleLd = ({ headline, description, path, added, updated, extra = {} }) => ({
@@ -226,7 +227,7 @@ const sectionExamples = {
 };
 const panelTone = { 'make-money-with-ai': 'band-light', 'save-time-and-money': 'band-soft', 'use-agents-safely': 'band-dark' };
 page({
-  path: '/', title: 'You’ve got the AI tools. Now what? AI use cases by job', lastmod: latestOf([...useCases, ...guides, { added: ADDED }]),
+  path: '/', title: 'AI use cases by job, with prompts and ROI | AIForThisJob', lastmod: latestOf([...useCases, ...guides, { added: ADDED }]),
   description: 'You’ve got the AI tools. Now what? A first page if you’re new, a first week if work just switched a tool on, and ideas for the job you do.',
   jsonld: [orgLd, siteLd], bodyClass: 'home',
   body: `

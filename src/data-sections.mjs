@@ -699,7 +699,7 @@ Use only my notes. Mark gaps as [TO ADD]. Use simple language an everyday person
 export const newGuides = [
   {
     slug: 'agent-permissions-and-approvals', section: 'use-agents-safely', added: T_NEW,
-    title: 'Agent permissions and approvals: give AI only the access it needs',
+    title: 'Limit an AI agent’s access and approvals',
     summary: 'How to decide what an AI agent may read, what it may do, and which actions a person must approve first.',
     body: `
 <p>An AI agent is useful because it can act: read your inbox, update a spreadsheet, post to social media, refund a customer. That’s also what makes it risky. OWASP, the security community that publishes widely used risk lists, calls the problem <strong>excessive agency</strong>: an AI system being able to do damage because something went wrong, whether a confused model, a badly worded instruction or a deliberately malicious message.</p>
@@ -823,7 +823,7 @@ Use simple language an everyday person would understand, and invented, clearly f
   },
   {
     slug: 'ai-agent-policy-template-and-checklist', section: 'use-agents-safely', added: T_NEW,
-    title: 'An AI and agents policy for your business: template and checklist',
+    title: 'AI and agents policy: template and checklist',
     summary: 'A short policy you can adapt in an afternoon, plus a checklist to run before any new AI tool or agent goes live.',
     body: `
 <p>You don’t need a 40-page document. You need a page your team will actually read, that answers three questions: what can we use, what can we put in it, and who decides. Large organisations publish fuller frameworks you can borrow from; the UK government’s AI Playbook, for example, sets out ten principles for using AI safely and effectively. The template below scales that thinking down for a small business.</p>
